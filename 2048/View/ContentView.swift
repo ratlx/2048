@@ -13,12 +13,20 @@ struct ContentView: View {
     @Environment(Game.self) var game
     
     var body: some View {
-        ZStack {
-            backgroundColor
-                .ignoresSafeArea()
-                    
-            GameView()
+        ScrollView(.vertical) {
+            VStack(spacing: 60) {
+                Spacer()
+                VStack {
+                    TitleView()
+                    GoalView()
+                }
+                GameView()
+                Spacer()
+                RulesView()
+            }
+            .frame(maxWidth: .infinity)
         }
+        .background(backgroundColor)
     }
         
 }

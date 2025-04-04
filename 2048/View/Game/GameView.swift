@@ -14,6 +14,8 @@ struct GameView: View {
     @State private var increaseList = IncreaseList()
     @State private var isRestart = false
     @State private var isGameOver = false
+    @State private var isWinner = false
+    @State private var isKeepGoing = true
     @Environment(Game.self) var game
     
     var body: some View {
@@ -28,6 +30,10 @@ struct GameView: View {
                 
                 GameOverView(isRestart: $isRestart)
                     .opacity(isGameOver ? 1 : 0)
+                
+                WinnerView(isRestart: $isRestart, isKeepGoing: $isKeepGoing)
+                    .opacity(isWinner ? 1 : 0)
+                    .opacity(isKeepGoing ? 0 : 1)
             }
             .environment(game.boardSize)
             .onAppear {
@@ -36,6 +42,7 @@ struct GameView: View {
             .gesture(
                 DragGesture()
                     .onEnded { value in
+                        guard isKeepGoing else { return }
                         Task {
                             let direction = getSwipeDirection(from: value)
                             let result = game.merge(direction: direction)
@@ -46,7 +53,7 @@ struct GameView: View {
                             await doMerge(merges: result.merges, newTile: result.newTile!)
                             
                             gameOverCheck()
-                            
+                            gameWinnerCheck()
                             game.save()
                         }
                     }
@@ -75,9 +82,12 @@ struct GameView: View {
     
     private func tilesPopUp(type: popUpType) {
         isGameOver = false
+        isWinner = false
+        isRestart = false
+        isKeepGoing = true
+        newAnimateTiles.removeAll()
         let initTiles = type == .newGame ? game.newGame() : game.gameInitialize()
         tileViews = initTiles.map { TileViewModel(tile: $0) }
-        newAnimateTiles.removeAll()
         
         withAnimation(.easeIn(duration: 0.2)) {
             for tileView in tileViews {
@@ -143,6 +153,15 @@ struct GameView: View {
         
         withAnimation(.easeIn(duration: 0.8).delay(1.2)) {
             isGameOver = true
+        }
+    }
+    
+    private func gameWinnerCheck() {
+        guard !isWinner && game.isWinner else { return }
+        
+        withAnimation(.easeIn(duration: 0.8).delay(1.2)) {
+            isWinner = true
+            isKeepGoing = false
         }
     }
 }

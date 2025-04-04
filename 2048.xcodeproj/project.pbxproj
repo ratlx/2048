@@ -21,6 +21,23 @@
 		50DCEC622D9665F6001656BA /* 2048Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = 2048Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		50095DE92DA0231200D2EE16 /* Exceptions for "2048Tests" folder in "2048" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				TestView.swift,
+			);
+			target = 507332BD2D79D22A00ABBCCF /* 2048 */;
+		};
+		50095DEA2DA0231200D2EE16 /* Exceptions for "2048Tests" folder in "2048Tests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				TestView.swift,
+			);
+			target = 50DCEC612D9665F6001656BA /* 2048Tests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		507332C02D79D22A00ABBCCF /* 2048 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -29,6 +46,10 @@
 		};
 		50DCEC632D9665F6001656BA /* 2048Tests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				50095DE92DA0231200D2EE16 /* Exceptions for "2048Tests" folder in "2048" target */,
+				50095DEA2DA0231200D2EE16 /* Exceptions for "2048Tests" folder in "2048Tests" target */,
+			);
 			path = 2048Tests;
 			sourceTree = "<group>";
 		};

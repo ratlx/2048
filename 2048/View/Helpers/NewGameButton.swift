@@ -18,7 +18,7 @@ struct NewGameButton: View {
             Text("New Game")
                 .padding(.horizontal, 4.0)
                 .foregroundStyle(brightTextColor)
-                .font(.title3)
+                .font(.headline)
                 .fontWeight(.bold)
                 .background {
                     RoundedRectangle(cornerRadius: 3)

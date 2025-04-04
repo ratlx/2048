@@ -38,6 +38,18 @@ class Game: Codable {
         boardSize.height * boardSize.width
     }
     
+    var isWinner: Bool {
+        guard score >= 18432 else { return false }
+        
+        var maxValue: UInt8 = 1
+        for i in valueBoard {
+            for j in i {
+                maxValue = max(maxValue, j)
+            }
+        }
+        return maxValue == 11
+    }
+    
     var gameOver: Bool {
         guard tilesAmount == totalAmount else { return false }
         
