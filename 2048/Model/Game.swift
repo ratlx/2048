@@ -10,18 +10,16 @@ import Foundation
 var initTilesAmount = 2
 
 @Observable
-class Game {
+class Game: Codable {
     var valueBoard: [[UInt8]]
     var score = 0
     var best = 0
     var tilesAmount = 0
-    var totalAmount: Int
     var boardSize: BoardSize
     
     init(boardSize: BoardSize) {
         self.boardSize = boardSize
         valueBoard = Array(repeating: Array(repeating: 0, count: boardSize.width), count: boardSize.height)
-        totalAmount = boardSize.height * boardSize.width
     }
     
     var emptyGrids: [(row: Int, col: Int)] {
@@ -34,6 +32,10 @@ class Game {
             }
         }
         return list
+    }
+    
+    var totalAmount: Int {
+        boardSize.height * boardSize.width
     }
     
     var gameOver: Bool {
@@ -110,8 +112,6 @@ class Game {
         tilesAmount += 1
         
         return (merges, newTile(), scoreIncrease)
-        
-        
         
         func eatRow(row: Int) {
             var colArray: [(col: Int, merged: Bool)]
@@ -229,5 +229,24 @@ class Game {
         }
     }
     
+    func gameInitialize() -> [Tile] {
+        if tilesAmount == 0 {
+            return newGame()
+        }
+        
+        var tiles: [Tile] = []
+        for row in 0..<boardSize.height {
+            for col in 0..<boardSize.width {
+                if valueBoard[row][col] != 0 {
+                    tiles.append(.init(value: valueBoard[row][col], row: row, col: col,boardSize: boardSize))
+                }
+            }
+        }
+        return tiles
+    }
+    
+    func save() {
+        DataManager.save(self, gameDataFileName)
+    }
 }
 

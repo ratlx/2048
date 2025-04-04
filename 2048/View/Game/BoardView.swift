@@ -10,15 +10,6 @@ import SwiftUI
 let gridMargin: CGFloat = 10
 let gameContainerColor = Color(red: 187/255, green: 173/255, blue: 160/255)
 
-extension BoardSize {
-    var boardWidth: CGFloat {
-        CGFloat(width) * (gridMargin + gridSize) + gridMargin
-    }
-    var boardHeight: CGFloat {
-        CGFloat(height) * (gridMargin + gridSize) + gridMargin
-    }
-}
-
 struct BoardView: View {
     @Environment(BoardSize.self) var boardSize
     

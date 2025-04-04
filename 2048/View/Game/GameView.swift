@@ -31,7 +31,7 @@ struct GameView: View {
             }
             .environment(game.boardSize)
             .onAppear {
-                newGame()
+                tilesPopUp(type: .initialize)
             }
             .gesture(
                 DragGesture()
@@ -46,11 +46,13 @@ struct GameView: View {
                             await doMerge(merges: result.merges, newTile: result.newTile!)
                             
                             gameOverCheck()
+                            
+                            game.save()
                         }
                     }
             )
             .onChange(of: isRestart) {
-                newGame()
+                tilesPopUp(type: .newGame)
             }
         }
     }
@@ -66,9 +68,14 @@ struct GameView: View {
         }
     }
     
-    private func newGame() {
+    enum popUpType {
+        case initialize
+        case newGame
+    }
+    
+    private func tilesPopUp(type: popUpType) {
         isGameOver = false
-        let initTiles = game.newGame()
+        let initTiles = type == .newGame ? game.newGame() : game.gameInitialize()
         tileViews = initTiles.map { TileViewModel(tile: $0) }
         newAnimateTiles.removeAll()
         
@@ -76,6 +83,10 @@ struct GameView: View {
             for tileView in tileViews {
                 newAnimateTiles.insert(tileView.id)
             }
+        }
+        
+        if type == .initialize {
+            gameOverCheck()
         }
     }
     

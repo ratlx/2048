@@ -9,12 +9,16 @@ import SwiftUI
 
 @main
 struct _048: App {
-    @State private var game = Game(boardSize: BoardSize())
+    @State private var game: Game
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(game)
         }
+    }
+    
+    init() {
+        game = DataManager.initializeGame(filename: gameDataFileName)
     }
 }
