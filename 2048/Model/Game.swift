@@ -7,20 +7,27 @@
 
 import Foundation
 
-var width: Int = 4                  // col (列)
-var height: Int = 4                 // row (行)
-let initTilesAmount = 2
+var initTilesAmount = 2
 
 @Observable
 class Game {
-    var valueBoard: [[UInt8]] = Array(repeating: Array(repeating: 0, count: width), count: height)
+    var valueBoard: [[UInt8]]
     var score = 0
     var best = 0
+    var tilesAmount = 0
+    var totalAmount: Int
+    var boardSize: BoardSize
+    
+    init(boardSize: BoardSize) {
+        self.boardSize = boardSize
+        valueBoard = Array(repeating: Array(repeating: 0, count: boardSize.width), count: boardSize.height)
+        totalAmount = boardSize.height * boardSize.width
+    }
     
     var emptyGrids: [(row: Int, col: Int)] {
         var list: [(Int, Int)] = []
-        for row in 0..<height {
-            for col in 0..<width {
+        for row in 0..<boardSize.height {
+            for col in 0..<boardSize.width {
                 if valueBoard[row][col] == 0 {
                     list.append((row, col))
                 }
@@ -30,9 +37,11 @@ class Game {
     }
     
     var gameOver: Bool {
-        for row in 0..<height {
-            for col in 0..<width {
-                if valueBoard[row][col] == 0 || (row+1 < height && valueBoard[row][col] == valueBoard[row+1][col]) || (col+1 < width && valueBoard[row][col] == valueBoard[row][col+1]) {
+        guard tilesAmount == totalAmount else { return false }
+        
+        for row in 0..<boardSize.height {
+            for col in 0..<boardSize.width {
+                if valueBoard[row][col] == 0 || (row+1 < boardSize.height && valueBoard[row][col] == valueBoard[row+1][col]) || (col+1 < boardSize.width && valueBoard[row][col] == valueBoard[row][col+1]) {
                     return false
                 }
             }
@@ -41,8 +50,9 @@ class Game {
     }
     
     func newGame() -> [Tile] {
-        valueBoard = Array(repeating: Array(repeating: 0, count: width), count: height)
+        valueBoard = Array(repeating: Array(repeating: 0, count: boardSize.width), count: boardSize.height)
         score = 0
+        tilesAmount = initTilesAmount
         
         var localEmptyGrids = emptyGrids
         var initTiles: [Tile] = []
@@ -51,7 +61,7 @@ class Game {
             let loc = localEmptyGrids.remove(at: idx)
             valueBoard[loc.row][loc.col] = chessValueInit
             
-            initTiles.append(.init(value: valueBoard[loc.row][loc.col], row: loc.row, col: loc.col))
+            initTiles.append(.init(value: valueBoard[loc.row][loc.col], row: loc.row, col: loc.col, boardSize: boardSize))
         }
         
         return initTiles
@@ -65,19 +75,19 @@ class Game {
         let loc = emptyGrids.randomElement()!
         valueBoard[loc.row][loc.col] = chessValueInit
         
-        return Tile(value: valueBoard[loc.row][loc.col], row: loc.row, col: loc.col)
+        return Tile(value: valueBoard[loc.row][loc.col], row: loc.row, col: loc.col, boardSize: boardSize)
     }
     
     func merge(direction: Direction) -> (merges: Merges, newTile: Tile?, scoreIncrease: Int) {
-        var merges = Merges()
+        let merges = Merges()
         var scoreIncrease = 0
         
         var range: Range<Int>
         switch direction {
         case .left, .right:
-            range = 0..<height
+            range = 0..<boardSize.height
         default:
-            range = 0..<width
+            range = 0..<boardSize.width
         }
         
         for i in range {
@@ -97,6 +107,7 @@ class Game {
         
         score += scoreIncrease
         best = max(best, score)
+        tilesAmount += 1
         
         return (merges, newTile(), scoreIncrease)
         
@@ -105,9 +116,9 @@ class Game {
         func eatRow(row: Int) {
             var colArray: [(col: Int, merged: Bool)]
             if direction == .left {
-                colArray = (0..<width).map() { ($0, false) }
+                colArray = (0..<boardSize.width).map() { ($0, false) }
             } else {
-                colArray = (0..<width).reversed().map() { ($0, false) }
+                colArray = (0..<boardSize.width).reversed().map() { ($0, false) }
             }
             
             for (i, eat) in colArray.enumerated() {
@@ -125,6 +136,7 @@ class Game {
                         valueBoard[row][eaten.col] = 0
                         valueBoard[row][eat.col] += 1
                         scoreIncrease += 1 << valueBoard[row][eat.col]
+                        tilesAmount -= 1
                     }
                     break
                 }
@@ -134,9 +146,9 @@ class Game {
         func eatCol(col: Int) {
             var rowArray: [(row: Int, merged: Bool)]
             if direction == .up {
-                rowArray = (0..<height).map { ($0, false) }
+                rowArray = (0..<boardSize.height).map { ($0, false) }
             } else {
-                rowArray = (0..<height).reversed().map { ($0, false) }
+                rowArray = (0..<boardSize.height).reversed().map { ($0, false) }
             }
             
             for (i, eat) in rowArray.enumerated() {
@@ -154,6 +166,7 @@ class Game {
                         valueBoard[eaten.row][col] = 0
                         valueBoard[eat.row][col] += 1
                         scoreIncrease += 1 << valueBoard[eat.row][col]
+                        tilesAmount -= 1
                     }
                     break
                 }
@@ -161,7 +174,7 @@ class Game {
         }
         
         func translateRow(row: Int) {
-            var colArray = Array(0..<width)
+            var colArray = Array(0..<boardSize.width)
             if direction == .right {
                 colArray.reverse()
             }
@@ -188,7 +201,7 @@ class Game {
         }
         
         func translateCol(col: Int) {
-            var rowArray = Array(0..<height)
+            var rowArray = Array(0..<boardSize.height)
             if direction == .down {
                 rowArray.reverse()
             }

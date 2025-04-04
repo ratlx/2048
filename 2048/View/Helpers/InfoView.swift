@@ -40,5 +40,5 @@ struct InfoView: View {
 
 #Preview {
     InfoView(type: .best)
-        .environment(Game())
+        .environment(Game(boardSize: BoardSize()))
 }

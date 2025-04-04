@@ -15,7 +15,7 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             backgroundColor
-                .ignoresSafeArea() 
+                .ignoresSafeArea()
                     
             GameView()
         }
@@ -25,5 +25,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environment(Game())
+        .environment(Game(boardSize: BoardSize()))
 }

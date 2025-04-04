@@ -7,22 +7,23 @@
 
 import Foundation
 
-struct Tile: Hashable {
+struct Tile {
     var value: UInt8
     var col: Int
     var row: Int
+    var boardSize: BoardSize
     
     var x: CGFloat {
         get {
-            let tx = col - width / 2
-            if width & 1 == 0 {
+            let tx = col - boardSize.width / 2
+            if boardSize.width & 1 == 0 {
                 return CGFloat(tx) + 0.5
             }
             return CGFloat(tx)
         }
         set {
-            col = Int(newValue) + width / 2
-            if width & 1 == 0 {
+            col = Int(newValue) + boardSize.width / 2
+            if boardSize.width & 1 == 0 {
                 col -= 1
             }
         }
@@ -30,24 +31,25 @@ struct Tile: Hashable {
     
     var y: CGFloat {
         get {
-            let ty = row - height / 2
-            if height & 1 == 0 {
+            let ty = row - boardSize.height / 2
+            if boardSize.height & 1 == 0 {
                 return CGFloat(ty) + 0.5
             }
             return CGFloat(ty)
         }
         set {
-            row = Int(newValue) + height / 2
-            if height & 1 == 0 {
+            row = Int(newValue) + boardSize.height / 2
+            if boardSize.height & 1 == 0 {
                 row -= 1
             }
         }
     }
     
-    init(value: UInt8 = 0, row: Int, col: Int) {
+    init(value: UInt8 = 0, row: Int, col: Int, boardSize: BoardSize) {
         self.value = value
         self.row = row
         self.col = col
+        self.boardSize = boardSize
     }
     
     

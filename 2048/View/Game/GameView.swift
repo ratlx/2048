@@ -12,7 +12,8 @@ struct GameView: View {
     @State private var newAnimateTiles: Set<UUID> = []
     @State private var eatAnimateTiles: Set<UUID> = []
     @State private var increaseList = IncreaseList()
-    @State private var restart = false
+    @State private var isRestart = false
+    @State private var isGameOver = false
     @Environment(Game.self) var game
     
     var body: some View {
@@ -20,11 +21,15 @@ struct GameView: View {
             HStack {
                 BestView()
                 ScoreView(increaseList: increaseList)
-                NewGameButton(restart: $restart)
+                NewGameButton(isRestart: $isRestart)
             }
             ZStack {
                 PlaygroundView(tileViews: $tileViews, newAnimateTiles: $newAnimateTiles, eatAnimateTiles: $eatAnimateTiles)
+                
+                GameOverView(isRestart: $isRestart)
+                    .opacity(isGameOver ? 1 : 0)
             }
+            .environment(game.boardSize)
             .onAppear {
                 newGame()
             }
@@ -33,17 +38,18 @@ struct GameView: View {
                     .onEnded { value in
                         Task {
                             let direction = getSwipeDirection(from: value)
-                            
                             let result = game.merge(direction: direction)
-                            if result.newTile == nil { return }
+                            guard let _ = result.newTile else { return }
                             
                             increaseList.add(value: result.scoreIncrease)
                             
                             await doMerge(merges: result.merges, newTile: result.newTile!)
+                            
+                            gameOverCheck()
                         }
                     }
             )
-            .onChange(of: restart) {
+            .onChange(of: isRestart) {
                 newGame()
             }
         }
@@ -61,6 +67,7 @@ struct GameView: View {
     }
     
     private func newGame() {
+        isGameOver = false
         let initTiles = game.newGame()
         tileViews = initTiles.map { TileViewModel(tile: $0) }
         newAnimateTiles.removeAll()
@@ -119,9 +126,17 @@ struct GameView: View {
 
         tileViews = tileViews.filter { $0.zState == .above }
     }
+    
+    private func gameOverCheck() {
+        guard game.gameOver else { return }
+        
+        withAnimation(.easeIn(duration: 0.8).delay(1.2)) {
+            isGameOver = true
+        }
+    }
 }
 
 #Preview {
     GameView()
-        .environment(Game())
+        .environment(Game(boardSize: BoardSize()))
 }

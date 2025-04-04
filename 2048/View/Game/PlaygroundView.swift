@@ -13,23 +13,26 @@ struct PlaygroundView: View {
     @Binding var eatAnimateTiles: Set<UUID>
     
     var body: some View {
-        BoardView()
-        
-        ForEach(tileViews) { tileView in
-            let newAnimate = newAnimateTiles.contains(tileView.id)
-            let eatAnimate = !eatAnimateTiles.contains(tileView.id)
+        ZStack {
+            BoardView()
             
-            TileView(tileViewModel: tileView)
-                .scaleEffect(eatAnimate ? 1 : 0)
-                .scaleEffect(newAnimate ? 1 : 0)
-                .opacity(newAnimate ? 1 : 0)
-                .offset(x: tileView.x, y: tileView.y)
-                .zIndex(tileView.z)
+            
+            ForEach(tileViews) { tileView in
+                let newAnimate = newAnimateTiles.contains(tileView.id)
+                let eatAnimate = !eatAnimateTiles.contains(tileView.id)
+                
+                TileView(tileViewModel: tileView)
+                    .scaleEffect(eatAnimate ? 1 : 0)
+                    .scaleEffect(newAnimate ? 1 : 0)
+                    .opacity(newAnimate ? 1 : 0)
+                    .offset(x: tileView.x, y: tileView.y)
+                    .zIndex(tileView.z)
+            }
         }
     }
 }
 
 #Preview {
     GameView()
-        .environment(Game())
+        .environment(Game(boardSize: BoardSize()))
 }

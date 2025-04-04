@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct _048: App {
-    @State private var game = Game()
+    @State private var game = Game(boardSize: BoardSize())
     
     var body: some Scene {
         WindowGroup {

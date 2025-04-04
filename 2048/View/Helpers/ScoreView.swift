@@ -35,5 +35,5 @@ struct ScoreView: View {
 #Preview {
     @Previewable @State var l = IncreaseList()
     ScoreView(increaseList: l)
-        .environment(Game())
+        .environment(Game(boardSize: BoardSize()))
 }

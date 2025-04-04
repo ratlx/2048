@@ -11,6 +11,7 @@ let gridSize: CGFloat = 57.5
 
 struct TileView: View {
     @Bindable var tileViewModel: TileViewModel
+    @Environment(BoardSize.self) var boardSize
     
     var body: some View {
         ZStack {
@@ -26,8 +27,8 @@ struct TileView: View {
 
     }
     
-    init(value: UInt8, row: Int = 0, col: Int = 0) {
-        tileViewModel = TileViewModel(tile: Tile(value: value, row: row, col: col))
+    init(value: UInt8, row: Int = 0, col: Int = 0, boardSize: BoardSize) {
+        tileViewModel = TileViewModel(tile: Tile(value: value, row: row, col: col, boardSize: boardSize))
     }
     
     init(tileViewModel: TileViewModel) {
@@ -36,5 +37,7 @@ struct TileView: View {
 }
 
 #Preview {
-    TileView(value: 11)
+    @Previewable @State var boardSize = BoardSize()
+    TileView(value: 11, boardSize: boardSize)
+        .environment(boardSize)
 }

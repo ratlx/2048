@@ -15,5 +15,5 @@ struct BestView: View {
 
 #Preview {
     BestView()
-        .environment(Game())
+        .environment(Game(boardSize: BoardSize()))
 }

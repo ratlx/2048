@@ -9,11 +9,11 @@ import SwiftUI
 
 
 struct NewGameButton: View {
-    @Binding var restart: Bool
+    @Binding var isRestart: Bool
     
     var body: some View {
         Button {
-            restart.toggle()
+            isRestart.toggle()
         } label: {
             Text("New Game")
                 .padding(.horizontal, 4.0)
@@ -30,6 +30,6 @@ struct NewGameButton: View {
 }
 
 #Preview {
-    @Previewable @State var restart = false
-    NewGameButton(restart: $restart)
+    @Previewable @State var isRestart = false
+    NewGameButton(isRestart: $isRestart)
 }

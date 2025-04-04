@@ -11,6 +11,7 @@ import SwiftUI
 let tileColor = Color(red: 238/255, green: 228/255, blue: 218/255)
 let textColor = Color(red: 119/255, green: 110/255, blue: 101/255)
 let brightTextColor = Color(red: 249/255, green: 246/255, blue: 242/255)
+let tileGoldColor = Color(red: 237/255, green: 194/255, blue: 46/255)
 
 @Observable
 class TileViewModel: Identifiable {
@@ -78,7 +79,7 @@ class TileViewModel: Identifiable {
         case 10:
             return Color(red: 237/255, green: 197/255, blue: 63/255)
         case 11:
-            return Color(red: 237/255, green: 194/255, blue: 46/255)
+            return tileGoldColor
         default:
             return Color(red: 60/255, green: 58/255, blue: 50/255)
         }
