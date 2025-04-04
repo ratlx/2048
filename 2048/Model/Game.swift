@@ -7,12 +7,15 @@
 
 import Foundation
 
-let width: Int = 4                  // col (列)
-let height: Int = 4                 // row (行)
+var width: Int = 4                  // col (列)
+var height: Int = 4                 // row (行)
+let initTilesAmount = 2
 
 @Observable
 class Game {
     var valueBoard: [[UInt8]] = Array(repeating: Array(repeating: 0, count: width), count: height)
+    var score = 0
+    var best = 0
     
     var emptyGrids: [(row: Int, col: Int)] {
         var list: [(Int, Int)] = []
@@ -37,29 +40,38 @@ class Game {
         return true
     }
     
-    func newGame() {
+    func newGame() -> [Tile] {
         valueBoard = Array(repeating: Array(repeating: 0, count: width), count: height)
-        tileCreate()
-        tileCreate()
-    }
-    
-    init() {
-        valueBoard = Array(repeating: Array(repeating: 0, count: width), count: height)
-        tileCreate()
-        tileCreate()
+        score = 0
+        
+        var localEmptyGrids = emptyGrids
+        var initTiles: [Tile] = []
+        for _ in 0..<initTilesAmount {
+            let idx = Int.random(in: 0..<localEmptyGrids.count)
+            let loc = localEmptyGrids.remove(at: idx)
+            valueBoard[loc.row][loc.col] = chessValueInit
+            
+            initTiles.append(.init(value: valueBoard[loc.row][loc.col], row: loc.row, col: loc.col))
+        }
+        
+        return initTiles
     }
     
     private var chessValueInit: UInt8 {
         UInt8.random(in: 0..<10) < 9 ? 1 : 2  // 90% 为 2，10% 为 4
     }
     
-    private func tileCreate() {
+    private func newTile() -> Tile {
         let loc = emptyGrids.randomElement()!
         valueBoard[loc.row][loc.col] = chessValueInit
+        
+        return Tile(value: valueBoard[loc.row][loc.col], row: loc.row, col: loc.col)
     }
     
-    func merge(direction: Direction) -> Merges {
+    func merge(direction: Direction) -> (merges: Merges, newTile: Tile?, scoreIncrease: Int) {
         var merges = Merges()
+        var scoreIncrease = 0
+        
         var range: Range<Int>
         switch direction {
         case .left, .right:
@@ -79,11 +91,14 @@ class Game {
             }
         }
         
-        if !merges.actions.isEmpty {
-            tileCreate()
+        if merges.actions.isEmpty {
+            return (merges, nil, scoreIncrease)
         }
         
-        return merges
+        score += scoreIncrease
+        best = max(best, score)
+        
+        return (merges, newTile(), scoreIncrease)
         
         
         
@@ -109,6 +124,7 @@ class Game {
                         //update the valueBoard
                         valueBoard[row][eaten.col] = 0
                         valueBoard[row][eat.col] += 1
+                        scoreIncrease += 1 << valueBoard[row][eat.col]
                     }
                     break
                 }
@@ -137,6 +153,7 @@ class Game {
                         //update the valueBoard
                         valueBoard[eaten.row][col] = 0
                         valueBoard[eat.row][col] += 1
+                        scoreIncrease += 1 << valueBoard[eat.row][col]
                     }
                     break
                 }

@@ -37,9 +37,9 @@ struct Tile: Hashable {
             return CGFloat(ty)
         }
         set {
-            col = Int(newValue) + width / 2
-            if width & 1 == 0 {
-                col -= 1
+            row = Int(newValue) + height / 2
+            if height & 1 == 0 {
+                row -= 1
             }
         }
     }
@@ -49,5 +49,6 @@ struct Tile: Hashable {
         self.row = row
         self.col = col
     }
+    
     
 }

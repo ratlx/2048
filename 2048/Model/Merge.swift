@@ -1,5 +1,5 @@
 //
-//  Direction.swift
+//  Merge.swift
 //  2048
 //
 //  Created by 小火锅 on 2025/3/6.
@@ -15,15 +15,15 @@ enum Direction: Int {
 }
 
 class Merges {
-    struct Position: Hashable {
+    struct Position: Hashable, Sendable {
         var col: Int, row: Int
     }
     
-    struct Action {
+    struct Action: Sendable {
         var eat: Position? = nil
         var onlyTranslate = false
-        lazy var dx = 0
-        lazy var dy = 0
+        var dx: Int? = nil
+        var dy: Int? = nil
     }
     
     var actions: [Position: Action] = [:]
@@ -54,9 +54,9 @@ class Merges {
             if let eaten = actions[from]?.eat {
                 switch direction {
                 case .left, .right:
-                    actions[eaten]!.dx += to.col - from.col
+                    actions[eaten]!.dx! += to.col - from.col
                 default:
-                    actions[eaten]!.dy += to.row - from.row
+                    actions[eaten]!.dy! += to.row - from.row
                 }
             } else {
                 assertionFailure("Impossible translation after being eaten!")

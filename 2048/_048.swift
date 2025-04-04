@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct Mobile2048App: App {
+struct _048: App {
     @State private var game = Game()
     
     var body: some Scene {

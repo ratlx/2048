@@ -9,6 +9,8 @@ import SwiftUI
 
 let gridMargin: CGFloat = 10
 
+let gameContainerColor = Color(red: 187/255, green: 173/255, blue: 160/255)
+
 struct BoardView: View {
     let boardWidth: CGFloat = CGFloat(width) * (gridMargin + gridSize) + gridMargin
     let boardHeight: CGFloat = CGFloat(height) * (gridMargin + gridSize) + gridMargin
@@ -16,7 +18,7 @@ struct BoardView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 6)
                 .frame(width: boardWidth, height: boardHeight)
-                .foregroundColor(Color(red: 187/255, green: 173/255, blue: 160/255))
+                .foregroundColor(gameContainerColor)
             HStack(spacing: gridMargin) {
                 ForEach(0..<width, id: \.self) { _ in
                     VStack(spacing: gridMargin) {

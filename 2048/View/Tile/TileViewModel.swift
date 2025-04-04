@@ -1,5 +1,5 @@
 //
-//  ChessStyle.swift
+//  TileViewModel.swift
 //  2048
 //
 //  Created by 小火锅 on 2025/3/7.
@@ -8,8 +8,20 @@
 import Foundation
 import SwiftUI
 
-class TileViewModel {
+let tileColor = Color(red: 238/255, green: 228/255, blue: 218/255)
+let textColor = Color(red: 119/255, green: 110/255, blue: 101/255)
+let brightTextColor = Color(red: 249/255, green: 246/255, blue: 242/255)
+
+@Observable
+class TileViewModel: Identifiable {
     private var tile: Tile
+    let id = UUID()
+    var zState: Z = .above
+    
+    enum Z: Double {
+        case below = 0
+        case above = 1
+    }
     
     var text: String {
         String(1 << Int(tile.value))
@@ -20,7 +32,7 @@ class TileViewModel {
             return Color(red: 249/255, green: 246/255, blue: 242/255)
         }
         else if tile.value > 0 {
-            return Color(red: 119/255, green: 110/255, blue: 101/255)
+            return textColor
         }
         return .clear
     }
@@ -44,7 +56,7 @@ class TileViewModel {
     var backgroundColor: Color {
         switch tile.value {
         case 0:
-            return Color(red: 238/255, green: 228/255, blue: 218/255, opacity: 0.35)
+            return tileColor.opacity(0.35)
         case 1:
             return Color(red: 238/255, green: 228/255, blue: 218/255)
         case 2:
@@ -80,16 +92,29 @@ class TileViewModel {
         tile.y * (gridSize + gridMargin)
     }
     
+    var z: Double {
+        zState.rawValue
+    }
+    
+    var col: Int {
+        tile.col
+    }
+    
+    var row: Int {
+        tile.row
+    }
+    
     func move(dx: Int = 0, dy: Int = 0) {
         tile.col += dx
         tile.row += dy
     }
     
-    func setValue(value: UInt8) throws {
-        tile.value = value
+    func increase() {
+        tile.value += 1
     }
     
-    init(value: UInt8, row: Int, col: Int) {
-        tile = Tile(value: value, row: row, col: col)
+    init(tile: Tile) {
+        self.tile = tile
     }
 }
+
