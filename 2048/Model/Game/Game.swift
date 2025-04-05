@@ -88,7 +88,7 @@ class Game: Codable {
     }
     
     private var chessValueInit: UInt8 {
-        UInt8.random(in: 0..<10) < 9 ? 7 : 8  // 90% 为 2，10% 为 4
+        UInt8.random(in: 0..<10) < 9 ? 1 : 2  // 90% 为 2，10% 为 4
     }
     
     private func newTile() -> Tile {

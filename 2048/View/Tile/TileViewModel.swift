@@ -116,7 +116,7 @@ class TileViewModel: Identifiable {
     
     var innerShadowRadius: Double {
         guard tile.value > 6 && tile.value <= targetValue else { return 0 }
-        return 2
+        return 3
     }
     
     var innerShadowColor: Color {

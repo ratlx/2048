@@ -16,22 +16,17 @@ struct TileView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: tileRadius)
-                .fill(tileViewModel.backgroundColor
-                    .shadow(
-                        .inner(color: tileViewModel.innerShadowColor,
-                               radius: tileViewModel.innerShadowRadius
-                              )
-                    )
-                )
+                .fill(tileViewModel.backgroundColor)
                 .frame(width: gameSize.gridSize, height: gameSize.gridSize)
                 .shadow(color: tileViewModel.shadowColor, radius: 30)
-            
-                
-                
-            
+                .overlay(
+                    RoundedRectangle(cornerRadius: tileRadius)
+                        .stroke(tileViewModel.innerShadowColor, lineWidth: tileViewModel.innerShadowRadius)
+                        .blur(radius: tileViewModel.innerShadowRadius)
+                )
+        
             Text(tileViewModel.text)
                 .font(.system(size: tileViewModel.fontSize, weight: .bold))
-                .frame(width: gameSize.gridSize, height: gameSize.gridSize, alignment: .center)
                 .foregroundColor(tileViewModel.fontColor)
         }
 
