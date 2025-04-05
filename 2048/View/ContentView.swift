@@ -33,5 +33,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environment(Game(boardSize: BoardSize()))
+        .environment(Game(gameSize: GameSize()))
 }

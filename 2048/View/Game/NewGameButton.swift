@@ -10,6 +10,7 @@ import SwiftUI
 
 struct NewGameButton: View {
     @Binding var isRestart: Bool
+    @Environment(GameSize.self) var gameSize
     
     var body: some View {
         Button {
@@ -21,10 +22,10 @@ struct NewGameButton: View {
                 .font(.headline)
                 .fontWeight(.bold)
                 .background {
-                    RoundedRectangle(cornerRadius: 3)
+                    RoundedRectangle(cornerRadius: tileRadius)
                         .fill(Color(red: 150/255, green: 138/255, blue: 128/255))
                 }
-                .frame(width: gridSize * 1.2)
+                .frame(width: gameSize.gridSize * 1.2)
         }
     }
 }
@@ -32,4 +33,5 @@ struct NewGameButton: View {
 #Preview {
     @Previewable @State var isRestart = false
     NewGameButton(isRestart: $isRestart)
+        .environment(GameSize())
 }

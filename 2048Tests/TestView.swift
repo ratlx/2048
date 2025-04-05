@@ -13,17 +13,17 @@ struct TestView: View {
     var body: some View {
         ZStack {
             BoardView()
-                .environment(game.boardSize)
+                .environment(game.gameSize)
             
-            HStack(spacing: gridMargin) {
-                ForEach(0..<game.boardSize.width, id: \.self) { col in
-                    VStack(spacing: gridMargin) {
-                        ForEach(0..<game.boardSize.height, id: \.self) { row in
-                            if game.valueBoard[row][col] > 0 {
-                                TileView(value: game.valueBoard[row][col], boardSize: game.boardSize)
+            HStack(spacing: game.gameSize.gridMargin) {
+                ForEach(0..<game.gameSize.width, id: \.self) { col in
+                    VStack(spacing: game.gameSize.gridMargin) {
+                        ForEach(0..<game.gameSize.height, id: \.self) { row in
+                            if game.valueBoard[row][col] < emptyValue {
+                                TileView(value: game.valueBoard[row][col], gameSize: game.gameSize)
                             } else {
                                 Color.clear
-                                    .frame(width: gridSize, height: gridSize)
+                                    .frame(width: game.gameSize.gridSize, height: game.gameSize.gridSize)
                             }
                         }
                     }
@@ -37,5 +37,5 @@ struct TestView: View {
     
     
     TestView()
-        .environment(Game(boardSize: BoardSize()))
+        .environment(Game(gameSize: GameSize()))
 }

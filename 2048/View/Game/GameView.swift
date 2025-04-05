@@ -14,8 +14,8 @@ struct GameView: View {
     @State private var increaseList = IncreaseList()
     @State private var isRestart = false
     @State private var isGameOver = false
-    @State private var isWinner = false
     @State private var isKeepGoing = true
+    @State private var isButtonEnabled = false
     @Environment(Game.self) var game
     
     var body: some View {
@@ -24,20 +24,23 @@ struct GameView: View {
                 BestView()
                 ScoreView(increaseList: increaseList)
                 NewGameButton(isRestart: $isRestart)
+                    .environment(game.gameSize)
             }
             ZStack {
                 PlaygroundView(tileViews: $tileViews, newAnimateTiles: $newAnimateTiles, eatAnimateTiles: $eatAnimateTiles)
                 
-                GameOverView(isRestart: $isRestart)
+                GameOverView(isRestart: $isRestart, isButtonEnabled: $isButtonEnabled)
                     .opacity(isGameOver ? 1 : 0)
                 
-                WinnerView(isRestart: $isRestart, isKeepGoing: $isKeepGoing)
-                    .opacity(isWinner ? 1 : 0)
+                WinnerView(isRestart: $isRestart, isKeepGoing: $isKeepGoing, isButtonEnabled: $isButtonEnabled)
+                    .opacity(game.winner ? 1 : 0)
                     .opacity(isKeepGoing ? 0 : 1)
             }
-            .environment(game.boardSize)
+            .environment(game.gameSize)
             .onAppear {
-                tilesPopUp(type: .initialize)
+                Task {
+                    await tilesPopUp(type: .initialize)
+                }
             }
             .gesture(
                 DragGesture()
@@ -52,14 +55,16 @@ struct GameView: View {
                             
                             await doMerge(merges: result.merges, newTile: result.newTile!)
                             
-                            gameOverCheck()
-                            gameWinnerCheck()
+                            await gameOverCheck()
+                            await gameWinnerCheck()
                             game.save()
                         }
                     }
             )
             .onChange(of: isRestart) {
-                tilesPopUp(type: .newGame)
+                Task {
+                    await tilesPopUp(type: .newGame)
+                }
             }
         }
     }
@@ -80,9 +85,8 @@ struct GameView: View {
         case newGame
     }
     
-    private func tilesPopUp(type: popUpType) {
+    private func tilesPopUp(type: popUpType) async {
         isGameOver = false
-        isWinner = false
         isRestart = false
         isKeepGoing = true
         newAnimateTiles.removeAll()
@@ -96,7 +100,7 @@ struct GameView: View {
         }
         
         if type == .initialize {
-            gameOverCheck()
+            await gameOverCheck()
         }
     }
     
@@ -148,25 +152,32 @@ struct GameView: View {
         tileViews = tileViews.filter { $0.zState == .above }
     }
     
-    private func gameOverCheck() {
+    private func gameOverCheck() async {
         guard game.gameOver else { return }
         
+        isButtonEnabled = false
         withAnimation(.easeIn(duration: 0.8).delay(1.2)) {
             isGameOver = true
         }
+    
+        try? await Task.sleep(nanoseconds: 2_000_000_000)
+        isButtonEnabled = true
     }
     
-    private func gameWinnerCheck() {
-        guard !isWinner && game.isWinner else { return }
+    private func gameWinnerCheck() async {
+        guard game.isWinner else { return }
         
+        isButtonEnabled = false
         withAnimation(.easeIn(duration: 0.8).delay(1.2)) {
-            isWinner = true
             isKeepGoing = false
         }
+        
+        try? await Task.sleep(nanoseconds: 2_000_000_000)
+        isButtonEnabled = true
     }
 }
 
 #Preview {
     GameView()
-        .environment(Game(boardSize: BoardSize()))
+        .environment(Game(gameSize: GameSize()))
 }

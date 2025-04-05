@@ -34,5 +34,5 @@ struct PlaygroundView: View {
 
 #Preview {
     GameView()
-        .environment(Game(boardSize: BoardSize()))
+        .environment(Game(gameSize: GameSize()))
 }

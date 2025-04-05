@@ -14,7 +14,10 @@ let brightTextColor = Color(red: 249/255, green: 246/255, blue: 242/255)
 let tileGoldColor = Color(red: 237/255, green: 194/255, blue: 46/255)
 let tileGoldGlowColor = Color(red: 250/255, green: 227/255, blue: 116/255)
 
-//let specialColors: [UInt8: Color] = [3: Color(red: )]
+let specialColors: [UInt8: Color] = [3: Color(red: 247/255, green: 142/255, blue: 72/255),
+                                     4: Color(red: 252/255, green: 94/255, blue: 46/255),
+                                     5: Color(red: 255/255, green: 51/255, blue: 51/255),
+                                     6: Color(red: 1, green: 0, blue: 0)]
 
 @Observable
 class TileViewModel: Identifiable {
@@ -28,57 +31,57 @@ class TileViewModel: Identifiable {
     }
     
     var text: String {
-        String(1 << Int(tile.value))
+        String(1 << tile.value)
     }
     
     var fontColor: Color {
-        if tile.value > 2 {
-            return brightTextColor
-        }
-        else if tile.value > 0 {
+        if tile.value <= 2 {
             return textColor
+        } else if tile.value < emptyValue {
+            return brightTextColor
         }
         return .clear
     }
     
     var fontSize: CGFloat {
         if tile.value < 7 {
-            return 35
+            return 0.6 * tile.gameSize.gridSize
+        } else if tile.value < 10 {
+            return 0.43 * tile.gameSize.gridSize
+        } else if tile.value < 12 {
+            return 0.34 * tile.gameSize.gridSize
+        } else if tile.value < 35 {
+            return 0.25 * tile.gameSize.gridSize
+        } else if tile.value < emptyValue {
+            return 0.2 * tile.gameSize.gridSize
         }
-        else if tile.value < 10 {
-            return 25
-        }
-        else if tile.value < 12 {
-            return 20
-        }
-        else if tile.value < 35 {
-            return 15
-        }
-        return 12
+        return 0
     }
     
     var backgroundColor: Color {
-        if tile.value == 0 {
-            return tileColor.opacity(0.35)
-        } else if tile.value < 12 {
+        if tile.value < 12 {
             let mixedBackGround = tileColor.mix(with: tileGoldColor, by: goldPercent)
             
-            /*if tile.value >= 3 && tile.value <= 6 {
-                switch tile.value {
-                case 3:
-                    mixedBackGround = mixedBackGround.mix(, by: <#T##Double#>)
-                }
-            }*/
+            if specialColors.keys.contains(tile.value) {
+                return mixedBackGround.mix(with: specialColors[tile.value]!, by: 0.55)
+            }
+            return mixedBackGround
+        } else if tile.value < emptyValue {
+            return tileGoldColor.mix(with: Color(red: 3/255, green: 3/255, blue: 3/255), by: 0.95)
         }
         return .clear
     }
     
+    var shadowColor: Color {
+        tileGoldGlowColor.opacity(glowOpacity / 1.8)
+    }
+    
     var x: CGFloat {
-        tile.x * (gridSize + gridMargin)
+        tile.x * (tile.gameSize.gridSize + tile.gameSize.gridMargin)
     }
     
     var y: CGFloat {
-        tile.y * (gridSize + gridMargin)
+        tile.y * (tile.gameSize.gridSize + tile.gameSize.gridMargin)
     }
     
     var z: Double {
@@ -102,8 +105,23 @@ class TileViewModel: Identifiable {
         tile.value += 1
     }
     
-    var goldPercent: Double {
-        Double(tile.value-1) / 10
+    private var goldPercent: Double {
+        Double(tile.value) / Double(targetValue)
+    }
+    
+    private var glowOpacity: Double {
+        guard tile.value > 6 && tile.value <= targetValue else { return 0 }
+        return goldPercent
+    }
+    
+    var innerShadowRadius: Double {
+        guard tile.value > 6 && tile.value <= targetValue else { return 0 }
+        return 2
+    }
+    
+    var innerShadowColor: Color {
+        guard tile.value > 6 && tile.value <= targetValue else { return .clear }
+        return .white.opacity(glowOpacity / 3)
     }
     
     init(tile: Tile) {

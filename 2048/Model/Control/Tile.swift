@@ -11,19 +11,19 @@ struct Tile {
     var value: UInt8
     var col: Int
     var row: Int
-    var boardSize: BoardSize
+    var gameSize: GameSize
     
     var x: CGFloat {
         get {
-            let tx = col - boardSize.width / 2
-            if boardSize.width & 1 == 0 {
+            let tx = col - gameSize.width / 2
+            if gameSize.width & 1 == 0 {
                 return CGFloat(tx) + 0.5
             }
             return CGFloat(tx)
         }
         set {
-            col = Int(newValue) + boardSize.width / 2
-            if boardSize.width & 1 == 0 {
+            col = Int(newValue) + gameSize.width / 2
+            if gameSize.width & 1 == 0 {
                 col -= 1
             }
         }
@@ -31,25 +31,25 @@ struct Tile {
     
     var y: CGFloat {
         get {
-            let ty = row - boardSize.height / 2
-            if boardSize.height & 1 == 0 {
+            let ty = row - gameSize.height / 2
+            if gameSize.height & 1 == 0 {
                 return CGFloat(ty) + 0.5
             }
             return CGFloat(ty)
         }
         set {
-            row = Int(newValue) + boardSize.height / 2
-            if boardSize.height & 1 == 0 {
+            row = Int(newValue) + gameSize.height / 2
+            if gameSize.height & 1 == 0 {
                 row -= 1
             }
         }
     }
     
-    init(value: UInt8 = 0, row: Int, col: Int, boardSize: BoardSize) {
+    init(value: UInt8 = 0, row: Int, col: Int, gameSize: GameSize) {
         self.value = value
         self.row = row
         self.col = col
-        self.boardSize = boardSize
+        self.gameSize = gameSize
     }
     
     

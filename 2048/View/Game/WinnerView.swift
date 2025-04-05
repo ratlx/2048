@@ -10,12 +10,13 @@ import SwiftUI
 struct WinnerView: View {
     @Binding var isRestart: Bool
     @Binding var isKeepGoing: Bool
-    @Environment(BoardSize.self) var boardSize
+    @Binding var isButtonEnabled: Bool
+    @Environment(GameSize.self) var gameSize
     
     var body: some View {
         ZStack(alignment: .center) {
-            RoundedRectangle(cornerRadius: 6)
-                .frame(width: boardSize.boardWidth, height: boardSize.boardHeight)
+            RoundedRectangle(cornerRadius: boardRadius)
+                .frame(width: gameSize.boardWidth, height: gameSize.boardHeight)
                 .foregroundStyle(tileGoldColor.opacity(0.5))
             
             VStack {
@@ -34,10 +35,11 @@ struct WinnerView: View {
                             .foregroundStyle(brightTextColor)
                             .padding(4)
                             .background {
-                                RoundedRectangle(cornerRadius: 3)
+                                RoundedRectangle(cornerRadius: tileRadius)
                                     .foregroundStyle(textColor)
                             }
                     }
+                    .disabled(!isButtonEnabled)
                     
                     Button {
                         isRestart = true
@@ -48,13 +50,14 @@ struct WinnerView: View {
                             .foregroundStyle(brightTextColor)
                             .padding(4)
                             .background {
-                                RoundedRectangle(cornerRadius: 3)
+                                RoundedRectangle(cornerRadius: tileRadius)
                                     .foregroundStyle(textColor)
                             }
                     }
+                    .disabled(!isButtonEnabled)
                 }
             }
-            .offset(y: (gridSize - gridMargin) / 2)
+            .offset(y: (gameSize.gridSize - gameSize.gridMargin) / 2)
         }
     }
 }
@@ -62,6 +65,7 @@ struct WinnerView: View {
 #Preview {
     @Previewable @State var isRestart = false
     @Previewable @State var isKeepGoing = false
-    WinnerView(isRestart: $isRestart, isKeepGoing: $isKeepGoing)
-        .environment(BoardSize())
+    @Previewable @State var isButtonEnabled = false
+    WinnerView(isRestart: $isRestart, isKeepGoing: $isKeepGoing, isButtonEnabled: $isButtonEnabled)
+        .environment(GameSize())
 }

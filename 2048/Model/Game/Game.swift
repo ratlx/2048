@@ -8,6 +8,8 @@
 import Foundation
 
 var initTilesAmount = 2
+let emptyValue: UInt8 = 63
+let targetValue: UInt8 = 11
 
 @Observable
 class Game: Codable {
@@ -15,18 +17,19 @@ class Game: Codable {
     var score = 0
     var best = 0
     var tilesAmount = 0
-    var boardSize: BoardSize
+    var gameSize: GameSize
+    var winner = false
     
-    init(boardSize: BoardSize) {
-        self.boardSize = boardSize
-        valueBoard = Array(repeating: Array(repeating: 0, count: boardSize.width), count: boardSize.height)
+    init(gameSize: GameSize) {
+        self.gameSize = gameSize
+        valueBoard = Array(repeating: Array(repeating: emptyValue, count: gameSize.width), count: gameSize.height)
     }
     
     var emptyGrids: [(row: Int, col: Int)] {
         var list: [(Int, Int)] = []
-        for row in 0..<boardSize.height {
-            for col in 0..<boardSize.width {
-                if valueBoard[row][col] == 0 {
+        for row in 0..<gameSize.height {
+            for col in 0..<gameSize.width {
+                if valueBoard[row][col] == emptyValue {
                     list.append((row, col))
                 }
             }
@@ -35,27 +38,29 @@ class Game: Codable {
     }
     
     var totalAmount: Int {
-        boardSize.height * boardSize.width
+        gameSize.height * gameSize.width
     }
     
     var isWinner: Bool {
-        guard score >= 18432 else { return false }
+        guard !winner && score >= 18432 else { return false }
         
-        var maxValue: UInt8 = 1
         for i in valueBoard {
             for j in i {
-                maxValue = max(maxValue, j)
+                if j == targetValue {
+                    winner = true
+                    return true
+                }
             }
         }
-        return maxValue == 11
+        return false
     }
     
     var gameOver: Bool {
         guard tilesAmount == totalAmount else { return false }
         
-        for row in 0..<boardSize.height {
-            for col in 0..<boardSize.width {
-                if valueBoard[row][col] == 0 || (row+1 < boardSize.height && valueBoard[row][col] == valueBoard[row+1][col]) || (col+1 < boardSize.width && valueBoard[row][col] == valueBoard[row][col+1]) {
+        for row in 0..<gameSize.height {
+            for col in 0..<gameSize.width {
+                if valueBoard[row][col] == emptyValue || (row+1 < gameSize.height && valueBoard[row][col] == valueBoard[row+1][col]) || (col+1 < gameSize.width && valueBoard[row][col] == valueBoard[row][col+1]) {
                     return false
                 }
             }
@@ -64,9 +69,10 @@ class Game: Codable {
     }
     
     func newGame() -> [Tile] {
-        valueBoard = Array(repeating: Array(repeating: 0, count: boardSize.width), count: boardSize.height)
+        valueBoard = Array(repeating: Array(repeating: emptyValue, count: gameSize.width), count: gameSize.height)
         score = 0
         tilesAmount = initTilesAmount
+        winner = false
         
         var localEmptyGrids = emptyGrids
         var initTiles: [Tile] = []
@@ -75,21 +81,21 @@ class Game: Codable {
             let loc = localEmptyGrids.remove(at: idx)
             valueBoard[loc.row][loc.col] = chessValueInit
             
-            initTiles.append(.init(value: valueBoard[loc.row][loc.col], row: loc.row, col: loc.col, boardSize: boardSize))
+            initTiles.append(.init(value: valueBoard[loc.row][loc.col], row: loc.row, col: loc.col, gameSize: gameSize))
         }
         
         return initTiles
     }
     
     private var chessValueInit: UInt8 {
-        UInt8.random(in: 0..<10) < 9 ? 1 : 2  // 90% 为 2，10% 为 4
+        UInt8.random(in: 0..<10) < 9 ? 7 : 8  // 90% 为 2，10% 为 4
     }
     
     private func newTile() -> Tile {
         let loc = emptyGrids.randomElement()!
         valueBoard[loc.row][loc.col] = chessValueInit
         
-        return Tile(value: valueBoard[loc.row][loc.col], row: loc.row, col: loc.col, boardSize: boardSize)
+        return Tile(value: valueBoard[loc.row][loc.col], row: loc.row, col: loc.col, gameSize: gameSize)
     }
     
     func merge(direction: Direction) -> (merges: Merges, newTile: Tile?, scoreIncrease: Int) {
@@ -99,9 +105,9 @@ class Game: Codable {
         var range: Range<Int>
         switch direction {
         case .left, .right:
-            range = 0..<boardSize.height
+            range = 0..<gameSize.height
         default:
-            range = 0..<boardSize.width
+            range = 0..<gameSize.width
         }
         
         for i in range {
@@ -128,24 +134,24 @@ class Game: Codable {
         func eatRow(row: Int) {
             var colArray: [(col: Int, merged: Bool)]
             if direction == .left {
-                colArray = (0..<boardSize.width).map() { ($0, false) }
+                colArray = (0..<gameSize.width).map() { ($0, false) }
             } else {
-                colArray = (0..<boardSize.width).reversed().map() { ($0, false) }
+                colArray = (0..<gameSize.width).reversed().map() { ($0, false) }
             }
             
             for (i, eat) in colArray.enumerated() {
-                if eat.merged || valueBoard[row][eat.col] == 0 {
+                if eat.merged || valueBoard[row][eat.col] == emptyValue {
                     continue
                 }
                 for (j, eaten) in colArray[(i+1)...].enumerated() {
-                    if !eaten.merged && valueBoard[row][eaten.col] == 0 {
+                    if !eaten.merged && valueBoard[row][eaten.col] == emptyValue {
                         continue
                     } else if valueBoard[row][eaten.col] == valueBoard[row][eat.col] {
                         //can be merged
                         merges.addEat(eaten: Merges.Position(col: eaten.col, row: row), eat: Merges.Position(col: eat.col, row: row), direction: direction)
                         colArray[j+i+1].merged = true
                         //update the valueBoard
-                        valueBoard[row][eaten.col] = 0
+                        valueBoard[row][eaten.col] = emptyValue
                         valueBoard[row][eat.col] += 1
                         scoreIncrease += 1 << valueBoard[row][eat.col]
                         tilesAmount -= 1
@@ -158,24 +164,24 @@ class Game: Codable {
         func eatCol(col: Int) {
             var rowArray: [(row: Int, merged: Bool)]
             if direction == .up {
-                rowArray = (0..<boardSize.height).map { ($0, false) }
+                rowArray = (0..<gameSize.height).map { ($0, false) }
             } else {
-                rowArray = (0..<boardSize.height).reversed().map { ($0, false) }
+                rowArray = (0..<gameSize.height).reversed().map { ($0, false) }
             }
             
             for (i, eat) in rowArray.enumerated() {
-                if eat.merged || valueBoard[eat.row][col] == 0 {
+                if eat.merged || valueBoard[eat.row][col] == emptyValue {
                     continue
                 }
                 for (j, eaten) in rowArray[(i+1)...].enumerated() {
-                    if !eaten.merged && valueBoard[eaten.row][col] == 0 {
+                    if !eaten.merged && valueBoard[eaten.row][col] == emptyValue {
                         continue
                     } else if valueBoard[eaten.row][col] == valueBoard[eat.row][col] {
                         //can be merged
                         merges.addEat(eaten: Merges.Position(col: col, row: eaten.row), eat: Merges.Position(col: col, row: eat.row), direction: direction)
                         rowArray[j+i+1].merged = true
                         //update the valueBoard
-                        valueBoard[eaten.row][col] = 0
+                        valueBoard[eaten.row][col] = emptyValue
                         valueBoard[eat.row][col] += 1
                         scoreIncrease += 1 << valueBoard[eat.row][col]
                         tilesAmount -= 1
@@ -186,19 +192,19 @@ class Game: Codable {
         }
         
         func translateRow(row: Int) {
-            var colArray = Array(0..<boardSize.width)
+            var colArray = Array(0..<gameSize.width)
             if direction == .right {
                 colArray.reverse()
             }
             
             for (i, col) in colArray.enumerated() {
-                if valueBoard[row][col] == 0 {
+                if valueBoard[row][col] == emptyValue {
                     continue
                 }
                 
                 var dstCol = col
                 for toCol in colArray[..<i].reversed() {
-                    if valueBoard[row][toCol] == 0 {
+                    if valueBoard[row][toCol] == emptyValue {
                         dstCol = toCol
                     } else {
                         break
@@ -213,19 +219,19 @@ class Game: Codable {
         }
         
         func translateCol(col: Int) {
-            var rowArray = Array(0..<boardSize.height)
+            var rowArray = Array(0..<gameSize.height)
             if direction == .down {
                 rowArray.reverse()
             }
             
             for (i, row) in rowArray.enumerated() {
-                if valueBoard[row][col] == 0 {
+                if valueBoard[row][col] == emptyValue {
                     continue
                 }
                 
                 var dstRow = row
                 for toRow in rowArray[..<i].reversed() {
-                    if valueBoard[toRow][col] == 0 {
+                    if valueBoard[toRow][col] == emptyValue {
                         dstRow = toRow
                     } else {
                         break
@@ -235,7 +241,7 @@ class Game: Codable {
                 if dstRow != row {
                     merges.addTranslate(from: Merges.Position(col: col, row: row), to: Merges.Position(col: col, row: dstRow), direction: direction)
                     valueBoard[dstRow][col] = valueBoard[row][col]
-                    valueBoard[row][col] = 0
+                    valueBoard[row][col] = emptyValue
                 }
             }
         }
@@ -247,10 +253,10 @@ class Game: Codable {
         }
         
         var tiles: [Tile] = []
-        for row in 0..<boardSize.height {
-            for col in 0..<boardSize.width {
-                if valueBoard[row][col] != 0 {
-                    tiles.append(.init(value: valueBoard[row][col], row: row, col: col,boardSize: boardSize))
+        for row in 0..<gameSize.height {
+            for col in 0..<gameSize.width {
+                if valueBoard[row][col] != emptyValue {
+                    tiles.append(.init(value: valueBoard[row][col], row: row, col: col,gameSize: gameSize))
                 }
             }
         }

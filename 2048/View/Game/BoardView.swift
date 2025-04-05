@@ -7,33 +7,33 @@
 
 import SwiftUI
 
-let gridMargin: CGFloat = 10
 let gameContainerColor = Color(red: 187/255, green: 173/255, blue: 160/255)
+let boardRadius: CGFloat = 6
 
 struct BoardView: View {
-    @Environment(BoardSize.self) var boardSize
+    @Environment(GameSize.self) var gameSize
     
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 6)
-                .frame(width: boardSize.boardWidth, height: boardSize.boardHeight)
-                .foregroundColor(gameContainerColor)
-            HStack(spacing: gridMargin) {
-                ForEach(0..<boardSize.width, id: \.self) { _ in
-                    VStack(spacing: gridMargin) {
-                        ForEach(0..<boardSize.height, id: \.self) { _ in
-                            RoundedRectangle(cornerRadius: 3)
-                                .frame(width: gridSize, height: gridSize)
-                                .foregroundColor(Color(red: 238/255, green: 228/255, blue: 218/255, opacity: 0.35))
-                        }
+        HStack(spacing: gameSize.gridMargin) {
+            ForEach(0..<gameSize.width, id: \.self) { _ in
+                VStack(spacing: gameSize.gridMargin) {
+                    ForEach(0..<gameSize.height, id: \.self) { _ in
+                        RoundedRectangle(cornerRadius: tileRadius)
+                            .frame(width: gameSize.gridSize, height: gameSize.gridSize)
+                            .foregroundColor(tileColor.opacity(0.35))
                     }
                 }
             }
+        }
+        .padding(gameSize.gridMargin)
+        .background {
+            RoundedRectangle(cornerRadius: boardRadius)
+                .foregroundColor(gameContainerColor)
         }
     }
 }
 
 #Preview {
     BoardView()
-        .environment(BoardSize())
+        .environment(GameSize())
 }

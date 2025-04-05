@@ -9,12 +9,13 @@ import SwiftUI
 
 struct GameOverView: View {
     @Binding var isRestart: Bool
-    @Environment(BoardSize.self) var boardSize
+    @Binding var isButtonEnabled: Bool
+    @Environment(GameSize.self) var gameSize
     
     var body: some View {
         ZStack(alignment: .center) {
-            RoundedRectangle(cornerRadius: 6)
-                .frame(width: boardSize.boardWidth, height: boardSize.boardHeight)
+            RoundedRectangle(cornerRadius: boardRadius)
+                .frame(width: gameSize.boardWidth, height: gameSize.boardHeight)
                 .foregroundStyle(tileColor.opacity(0.5))
             
             VStack {
@@ -32,18 +33,25 @@ struct GameOverView: View {
                         .foregroundStyle(brightTextColor)
                         .padding(4)
                         .background {
-                            RoundedRectangle(cornerRadius: 3)
+                            RoundedRectangle(cornerRadius: tileRadius)
                                 .foregroundStyle(textColor)
                         }
                 }
+                .disabled(!isButtonEnabled)
+                
+                /*Button("bigger") {
+                    gameSize.height += 1
+                    gameSize.width += 1
+                }*/
             }
-            .offset(y: (gridSize - gridMargin) / 2)
+            .offset(y: (gameSize.gridSize - gameSize.gridMargin) / 2)
         }
     }
 }
 
 #Preview {
     @Previewable @State var isRestart = false
-    GameOverView(isRestart: $isRestart)
-        .environment(BoardSize())
+    @Previewable @State var isButtonEnabled = false
+    GameOverView(isRestart: $isRestart, isButtonEnabled: $isButtonEnabled)
+        .environment(GameSize())
 }

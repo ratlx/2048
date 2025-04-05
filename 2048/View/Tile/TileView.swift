@@ -7,28 +7,38 @@
 
 import SwiftUI
 
-let gridSize: CGFloat = 57.5
+let tileRadius: CGFloat = 3
 
 struct TileView: View {
     @Bindable var tileViewModel: TileViewModel
-    @Environment(BoardSize.self) var boardSize
+    @Environment(GameSize.self) var gameSize
     
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 3)
-                .frame(width: gridSize, height: gridSize)
-                .foregroundColor(tileViewModel.backgroundColor)
+            RoundedRectangle(cornerRadius: tileRadius)
+                .fill(tileViewModel.backgroundColor
+                    .shadow(
+                        .inner(color: tileViewModel.innerShadowColor,
+                               radius: tileViewModel.innerShadowRadius
+                              )
+                    )
+                )
+                .frame(width: gameSize.gridSize, height: gameSize.gridSize)
+                .shadow(color: tileViewModel.shadowColor, radius: 30)
+            
+                
+                
             
             Text(tileViewModel.text)
                 .font(.system(size: tileViewModel.fontSize, weight: .bold))
-                .frame(width: gridSize, height: gridSize, alignment: .center)
+                .frame(width: gameSize.gridSize, height: gameSize.gridSize, alignment: .center)
                 .foregroundColor(tileViewModel.fontColor)
         }
 
     }
     
-    init(value: UInt8, row: Int = 0, col: Int = 0, boardSize: BoardSize) {
-        tileViewModel = TileViewModel(tile: Tile(value: value, row: row, col: col, boardSize: boardSize))
+    init(value: UInt8, row: Int = 0, col: Int = 0, gameSize: GameSize) {
+        tileViewModel = TileViewModel(tile: Tile(value: value, row: row, col: col, gameSize: gameSize))
     }
     
     init(tileViewModel: TileViewModel) {
@@ -37,7 +47,11 @@ struct TileView: View {
 }
 
 #Preview {
-    @Previewable @State var boardSize = BoardSize()
-    TileView(value: 11, boardSize: boardSize)
-        .environment(boardSize)
+    @Previewable @State var gameSize = GameSize()
+    VStack(spacing: 20) {
+        TileView(value: 11, gameSize: gameSize)
+            
+        TileView(value: 10, gameSize: gameSize)
+    }
+    .environment(gameSize)
 }

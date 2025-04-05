@@ -30,15 +30,15 @@ struct InfoView: View {
         }
         .padding(.top, 6)
         .background {
-            RoundedRectangle(cornerRadius: 3)
+            RoundedRectangle(cornerRadius: tileRadius)
                 .foregroundColor(gameContainerColor)
-                .frame(minWidth: gridSize * 1.5)
+                .frame(minWidth: game.gameSize.gridSize * 1.5)
         }
-        .frame(width: 1.5 * gridSize)
+        .frame(width: 1.5 * game.gameSize.gridSize)
     }
 }
 
 #Preview {
     InfoView(type: .best)
-        .environment(Game(boardSize: BoardSize()))
+        .environment(Game(gameSize: GameSize()))
 }

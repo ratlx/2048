@@ -9,24 +9,24 @@ import Testing
 @testable import _048
 
 struct _048Tests {
-    @Test func setXY() throws {
-        var tile = Tile(row: 2, col: 1, boardSize: BoardSize(width: 5, height: 4))
+    @Test func setXY() async throws {
+        var tile = Tile(row: 2, col: 1, gameSize: GameSize(width: 5, height: 4))
         
-        /*00000
-         *00000
-         *0x000
-         *00000*/
+        /*eeeee
+         *eeeee
+         *exeee
+         *eeeee*/
         tile.x += 2
         tile.y -= 1
-        /*00000
-         *000x0
-         *00000
-         *00000*/
+        /*eeeee
+         *eeexe
+         *eeeee
+         *eeeee*/
         #expect(tile.col == 3 && tile.row == 1)
     }
     
-    @Test func gameOver() throws {
-        let game = Game(boardSize: BoardSize())
+    @Test func gameOver() async throws {
+        let game = Game(gameSize: GameSize())
         game.valueBoard = [[1,2,3,4], [2,3,4,1], [3,4,1,2], [4,1,2,3]]
         game.tilesAmount = 16
         #expect(game.gameOver == true)
@@ -34,39 +34,39 @@ struct _048Tests {
         game.valueBoard[3][3] = 2
         #expect(game.gameOver == false)
         
-        game.valueBoard[3][3] = 0
+        game.valueBoard[3][3] = emptyValue
         #expect(game.gameOver == false)
     }
     
-    @Test func doMerge() throws {
-        var game = Game(boardSize: BoardSize())
-        game.valueBoard = [[1,0,0,1], [1,0,2,1], [0,2,0,1], [1,2,2,1]]
+    @Test func doMerge() async throws {
+        var game = Game(gameSize: GameSize())
+        game.valueBoard = [[1,emptyValue,emptyValue,1], [1,emptyValue,2,1], [emptyValue,2,emptyValue,1], [1,2,2,1]]
         game.tilesAmount = 11
         
-        /*1001
-         *1021
-         *0201
+        /*1ee1
+         *1e21
+         *e2e1
          *1221*/
         var tile = game.merge(direction: .right).newTile!
-        /*xxx2
-         *x121
-         *xx21
-         *x131*/
+        /*eee2
+         *e121
+         *ee21
+         *e131*/
         
-        var expect: [[UInt8]] = [[0,0,0,2], [0,1,2,1], [0,0,2,1], [0,1,3,1]]
+        var expect: [[UInt8]] = [[emptyValue,emptyValue,emptyValue,2], [emptyValue,1,2,1], [emptyValue,emptyValue,2,1], [emptyValue,1,3,1]]
         expect[tile.row][tile.col] = tile.value
         
         #expect(game.valueBoard == expect)
         #expect(game.tilesAmount == 10)
         
-        game.boardSize = BoardSize(width: 4, height: 5)
-        game.valueBoard = [[1,0,0,2], [1,1,3,1], [1,0,0,2], [1,0,0,0], [1,2,3,1]]
+        game.gameSize = GameSize(width: 4, height: 5)
+        game.valueBoard = [[1,emptyValue,emptyValue,2], [1,1,3,1], [1,emptyValue,emptyValue,2], [1,emptyValue,emptyValue,emptyValue], [1,2,3,1]]
         game.tilesAmount = 13
         
-        /*1002
+        /*1ee2
          *1131
-         *1002
-         *1000
+         *1ee2
+         *1eee
          *1231*/
         tile = game.merge(direction: .down).newTile!
         /*xxxx
@@ -75,10 +75,23 @@ struct _048Tests {
          *21x2
          *2241*/
         
-        expect = [[0,0,0,0],[0,0,0,2],[1,0,0,1],[2,1,0,2],[2,2,4,1]]
+        expect = [[emptyValue,emptyValue,emptyValue,emptyValue],[emptyValue,emptyValue,emptyValue,2],[1,emptyValue,emptyValue,1],[2,1,emptyValue,2],[2,2,4,1]]
         expect[tile.row][tile.col] = tile.value
         
         #expect(game.valueBoard == expect)
         #expect(game.tilesAmount == 11)
+    }
+    
+    @Test func winner() async throws {
+        var game = Game(gameSize: GameSize())
+        game.score = 20000
+        
+        game.valueBoard[1][1] = targetValue
+        
+        #expect(game.isWinner == true)
+        
+        game.valueBoard[1][1] = targetValue + 1
+        
+        #expect(game.isWinner == false)
     }
 }

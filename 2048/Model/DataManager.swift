@@ -8,7 +8,7 @@
 import Foundation
 
 let resourcesURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Resources")
-let gameDataFileName = "gameData.json"
+let gameDataFileName = "s1.json"
 
 struct DataManager {
     
@@ -57,7 +57,7 @@ struct DataManager {
                 }
             }
 
-            let defaultGame = Game(boardSize: BoardSize())
+            let defaultGame = Game(gameSize: GameSize())
 
             save(defaultGame, filename)
             

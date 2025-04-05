@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ScoreView: View {
     @Bindable var increaseList: IncreaseList
+    @Environment(Game.self) var game
     
     var body: some View {
         InfoView(type: .current)
@@ -19,7 +20,7 @@ struct ScoreView: View {
                     .font(.title3)
                     .fontWeight(.bold)
                     .foregroundStyle(textColor)
-                    .offset(y: increase.animate ? 10 : -gridSize)
+                    .offset(y: increase.animate ? 10 : -game.gameSize.gridSize)
                     .opacity(increase.animate ? 1 : 0)
                     .onAppear {
                         withAnimation(.easeOut(duration: 0.6)) {
@@ -35,5 +36,5 @@ struct ScoreView: View {
 #Preview {
     @Previewable @State var l = IncreaseList()
     ScoreView(increaseList: l)
-        .environment(Game(boardSize: BoardSize()))
+        .environment(Game(gameSize: GameSize()))
 }
