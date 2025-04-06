@@ -26,13 +26,6 @@ struct ContentView: View {
                 
             }
             .frame(maxWidth: .infinity)
-            .toolbar {
-                Button {
-                    
-                } label: {
-                    Label("Game Setting", systemImage: "gear.circle")
-                }
-            }
         }
         .background(backgroundColor)
     }
