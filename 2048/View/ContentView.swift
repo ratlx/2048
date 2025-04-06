@@ -23,8 +23,16 @@ struct ContentView: View {
                 GameView()
                 Spacer()
                 RulesView()
+                
             }
             .frame(maxWidth: .infinity)
+            .toolbar {
+                Button {
+                    
+                } label: {
+                    Label("Game Setting", systemImage: "gear.circle")
+                }
+            }
         }
         .background(backgroundColor)
     }
