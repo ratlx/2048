@@ -47,6 +47,10 @@ struct TileView: View {
         TileView(value: 11, gameSize: gameSize)
             
         TileView(value: 10, gameSize: gameSize)
+        
+        TileView(value: 9, gameSize: gameSize)
+        
+        TileView(value: 8, gameSize: gameSize)
     }
     .environment(gameSize)
 }

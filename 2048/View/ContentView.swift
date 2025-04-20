@@ -14,7 +14,7 @@ struct ContentView: View {
     
     var body: some View {
         ScrollView(.vertical) {
-            VStack(spacing: 60) {
+            VStack(spacing: 40) {
                 Spacer()
                 VStack {
                     TitleView()
@@ -23,6 +23,7 @@ struct ContentView: View {
                 GameView()
                 Spacer()
                 RulesView()
+                    .offset(y: -20)
                 
             }
             .frame(maxWidth: .infinity)

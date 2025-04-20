@@ -21,7 +21,7 @@ let specialColors: [UInt8: Color] = [3: Color(red: 247/255, green: 142/255, blue
 
 @Observable
 class TileViewModel: Identifiable {
-    private var tile: Tile
+    var tile: Tile
     let id = UUID()
     var zState: Z = .above
     

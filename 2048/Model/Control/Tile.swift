@@ -51,6 +51,4 @@ struct Tile {
         self.col = col
         self.gameSize = gameSize
     }
-    
-    
 }

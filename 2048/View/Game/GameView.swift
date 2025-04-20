@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+private var mergingCount = 0
+private var mergingSafety = true
+
 struct GameView: View {
     @State private var tileViews: [TileViewModel] = []
     @State private var newAnimateTiles: Set<UUID> = []
@@ -16,6 +19,7 @@ struct GameView: View {
     @State private var isGameOver = false
     @State private var isKeepGoing = true
     @State private var isButtonEnabled = false
+    @State private var isAIEnable = false
     @Environment(Game.self) var game
     
     var body: some View {
@@ -45,55 +49,64 @@ struct GameView: View {
             .gesture(
                 DragGesture()
                     .onEnded { value in
-                        guard isKeepGoing else { return }
+                        guard isKeepGoing && !isAIEnable else { return }
                         Task {
-                            let direction = getSwipeDirection(from: value)
-                            let result = game.merge(direction: direction)
-                            guard let _ = result.newTile else { return }
-                            
-                            increaseList.add(value: result.scoreIncrease)
-                            
-                            await doMerge(merges: result.merges, newTile: result.newTile!)
-                            
-                            await gameOverCheck()
-                            await gameWinnerCheck()
-                            game.save()
+                            await manulMerge(from: value)
                         }
                     }
             )
             .onChange(of: isRestart) {
                 Task {
                     await tilesPopUp(type: .newGame)
+                    await aiMerge()
                 }
             }
+            .onChange(of: isAIEnable) {
+                Task {
+                    await aiMerge()
+                }
+            }
+            
+            aiButton(aiEnable: $isAIEnable)
+                .offset(y: 10)
         }
     }
     
-    private func getSwipeDirection(from value: DragGesture.Value) -> Direction {
+    private func manulMerge(from value: DragGesture.Value) async {
         let horizontalAmount = value.translation.width
         let verticalAmount = value.translation.height
-
+        let direction: Direction
+        
         if abs(horizontalAmount) > abs(verticalAmount) {
-            return horizontalAmount > 0 ? .right : .left
+            direction = horizontalAmount > 0 ? .right : .left
         } else {
-            return verticalAmount > 0 ? .down : .up
+            direction = verticalAmount > 0 ? .down : .up
+        }
+        
+        await doMerge(direction: direction)
+    }
+    
+    private func aiMerge() async {
+        let directions: [Direction] = [.left, .down, .right, .up]
+        while isAIEnable && isKeepGoing && !isGameOver {
+            await doMerge(direction: directions.randomElement()!)
         }
     }
     
-    enum popUpType {
+    enum PopUpType {
         case initialize
         case newGame
+        case examine
     }
     
-    private func tilesPopUp(type: popUpType) async {
+    private func tilesPopUp(type: PopUpType) async {
         isGameOver = false
-        isRestart = false
         isKeepGoing = true
         newAnimateTiles.removeAll()
         let initTiles = type == .newGame ? game.newGame() : game.gameInitialize()
         tileViews = initTiles.map { TileViewModel(tile: $0) }
         
-        withAnimation(.easeIn(duration: 0.2)) {
+        withAnimation(type == .examine ? .none : .easeIn(duration: 0.2)) {
             for tileView in tileViews {
                 newAnimateTiles.insert(tileView.id)
             }
@@ -104,52 +117,86 @@ struct GameView: View {
         }
     }
     
-    private func doMerge(merges: Merges, newTile tile: Tile) async {
-        var eatList = Set<UUID>()
-
-        for tileView in tileViews {
-            if let action = merges.actions[.init(col: tileView.col, row: tileView.row)] {
-                if action.eat == nil && !action.onlyTranslate {
-                    tileView.zState = .below
-                } else if action.eat != nil {
-                    eatList.insert(tileView.id)
-                }
-            }
-        }
-
-        withAnimation(.easeInOut(duration: 0.1)) {
+    private func doMerge(direction: Direction) async {
+        mergingCount += 1
+        if mergingCount > 1 { mergingSafety = false }
+        print("current running: \(mergingCount)")
+        defer { mergingCount -= 1 }
+        
+        let result = game.merge(direction: direction)
+        guard let _ = result.newTile else { return }
+        
+        increaseList.add(value: result.scoreIncrease)
+        
+        await animate(merges: result.merges, tile: result.newTile!)
+        await gameExamine()
+        
+        await gameWinnerCheck()
+        await gameOverCheck()
+        game.save()
+        
+        func animate(merges: Merges, tile: Tile) async {
+            var eatList = Set<UUID>()
+            
             for tileView in tileViews {
                 if let action = merges.actions[.init(col: tileView.col, row: tileView.row)] {
-                    tileView.move(dx: action.dx ?? 0, dy: action.dy ?? 0)
+                    if action.eat == nil && !action.onlyTranslate {
+                        tileView.zState = .below
+                    } else if action.eat != nil {
+                        eatList.insert(tileView.id)
+                    }
                 }
             }
+            
+            withAnimation(.easeInOut(duration: 0.1)) {
+                for tileView in tileViews {
+                    if let action = merges.actions[.init(col: tileView.col, row: tileView.row)] {
+                        tileView.move(dx: action.dx ?? 0, dy: action.dy ?? 0)
+                    }
+                }
+            }
+            
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            for tileView in tileViews {
+                if eatList.contains(tileView.id) {
+                    tileView.increase()
+                }
+            }
+            tileViews.append(.init(tile: tile))
+            eatAnimateTiles = eatList
+            
+            if !eatList.isEmpty {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            }
+            
+            withAnimation(.spring(duration: 0.2, bounce: 0.5)) {
+                eatAnimateTiles.removeAll()
+            }
+            
+            withAnimation(.easeIn(duration: 0.2)) {
+                let _ = newAnimateTiles.insert(tileViews.last!.id)
+            }
+            
+            try? await Task.sleep(nanoseconds: 200_000_000)
+            tileViews = tileViews.filter { $0.zState == .above }
         }
-
-        try? await Task.sleep(nanoseconds: 100_000_000)
-
+    }
+    
+    private func gameExamine() async {
+        guard mergingCount == 1 && !mergingSafety else { return }
+        defer { mergingSafety = true }
+        
+        var equal = true
         for tileView in tileViews {
-            if eatList.contains(tileView.id) {
-                tileView.increase()
+            if game.valueBoard[tileView.row][tileView.col] != tileView.tile.value {
+                equal = false
+                break
             }
         }
-        tileViews.append(.init(tile: tile))
-        eatAnimateTiles = eatList
-        
-        if !eatList.isEmpty {
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        if !equal || tileViews.count != game.tilesAmount {
+            await tilesPopUp(type: .examine)
+            print("Correction completed")
         }
-
-        withAnimation(.spring(duration: 0.2, bounce: 0.5)) {
-            eatAnimateTiles.removeAll()
-        }
-        
-        withAnimation(.easeIn(duration: 0.2)) {
-            let _ = newAnimateTiles.insert(tileViews.last!.id)
-        }
-        
-        try? await Task.sleep(nanoseconds: 200_000_000)
-
-        tileViews = tileViews.filter { $0.zState == .above }
     }
     
     private func gameOverCheck() async {

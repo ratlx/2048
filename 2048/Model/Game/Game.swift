@@ -18,7 +18,7 @@ class Game: Codable {
     var best = 0
     var tilesAmount = 0
     var gameSize: GameSize
-    var winner = false
+    var winner = false              
     
     init(gameSize: GameSize) {
         self.gameSize = gameSize
@@ -94,7 +94,9 @@ class Game: Codable {
     private func newTile() -> Tile {
         let loc = emptyGrids.randomElement()!
         valueBoard[loc.row][loc.col] = chessValueInit
+        tilesAmount += 1
         
+        //print(valueBoard, tilesAmount)
         return Tile(value: valueBoard[loc.row][loc.col], row: loc.row, col: loc.col, gameSize: gameSize)
     }
     
@@ -127,7 +129,6 @@ class Game: Codable {
         
         score += scoreIncrease
         best = max(best, score)
-        tilesAmount += 1
         
         return (merges, newTile(), scoreIncrease)
         

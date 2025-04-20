@@ -25,7 +25,7 @@ struct GameOverView: View {
                     .foregroundStyle(textColor)
                 
                 Button {
-                    isRestart = true
+                    isRestart.toggle()
                 } label: {
                     Text("Try again")
                         .font(.callout)
