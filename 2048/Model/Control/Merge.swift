@@ -7,8 +7,8 @@
 
 import Foundation
 
-enum Direction: Int {
-    case up
+enum Direction: Int32 {
+    case up = 0
     case down
     case left
     case right

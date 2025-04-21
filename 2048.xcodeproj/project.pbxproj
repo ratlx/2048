@@ -6,7 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		508773FA2DB64ACC001F88BC /* _048_ai.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 508773F22DB64ACC001F88BC /* _048_ai.framework */; };
+		508773FB2DB64ACC001F88BC /* _048_ai.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 508773F22DB64ACC001F88BC /* _048_ai.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		508773F82DB64ACC001F88BC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 507332B62D79D22A00ABBCCF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 508773F12DB64ACC001F88BC;
+			remoteInfo = "2048-ai";
+		};
 		50DCEC662D9665F6001656BA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 507332B62D79D22A00ABBCCF /* Project object */;
@@ -16,8 +28,23 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		508774002DB64ACC001F88BC /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				508773FB2DB64ACC001F88BC /* _048_ai.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		507332BE2D79D22A00ABBCCF /* 2048.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = 2048.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		508773F22DB64ACC001F88BC /* _048_ai.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = _048_ai.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		50DCEC622D9665F6001656BA /* 2048Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = 2048Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -36,12 +63,30 @@
 			);
 			target = 50DCEC612D9665F6001656BA /* 2048Tests */;
 		};
+		508773FF2DB64ACC001F88BC /* Exceptions for "2048-ai" folder in "2048-ai" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			publicHeaders = (
+				_048_ai.h,
+				2048.h,
+				config.h,
+				platdefs.h,
+			);
+			target = 508773F12DB64ACC001F88BC /* 2048-ai */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		507332C02D79D22A00ABBCCF /* 2048 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = 2048;
+			sourceTree = "<group>";
+		};
+		508773F32DB64ACC001F88BC /* 2048-ai */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				508773FF2DB64ACC001F88BC /* Exceptions for "2048-ai" folder in "2048-ai" target */,
+			);
+			path = "2048-ai";
 			sourceTree = "<group>";
 		};
 		50DCEC632D9665F6001656BA /* 2048Tests */ = {
@@ -57,6 +102,14 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		507332BB2D79D22A00ABBCCF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				508773FA2DB64ACC001F88BC /* _048_ai.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		508773EF2DB64ACC001F88BC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -78,6 +131,7 @@
 			children = (
 				507332C02D79D22A00ABBCCF /* 2048 */,
 				50DCEC632D9665F6001656BA /* 2048Tests */,
+				508773F32DB64ACC001F88BC /* 2048-ai */,
 				507332BF2D79D22A00ABBCCF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -87,11 +141,22 @@
 			children = (
 				507332BE2D79D22A00ABBCCF /* 2048.app */,
 				50DCEC622D9665F6001656BA /* 2048Tests.xctest */,
+				508773F22DB64ACC001F88BC /* _048_ai.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		508773ED2DB64ACC001F88BC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		507332BD2D79D22A00ABBCCF /* 2048 */ = {
@@ -101,10 +166,12 @@
 				507332BA2D79D22A00ABBCCF /* Sources */,
 				507332BB2D79D22A00ABBCCF /* Frameworks */,
 				507332BC2D79D22A00ABBCCF /* Resources */,
+				508774002DB64ACC001F88BC /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				508773F92DB64ACC001F88BC /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				507332C02D79D22A00ABBCCF /* 2048 */,
@@ -115,6 +182,29 @@
 			productName = 2048;
 			productReference = 507332BE2D79D22A00ABBCCF /* 2048.app */;
 			productType = "com.apple.product-type.application";
+		};
+		508773F12DB64ACC001F88BC /* 2048-ai */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 508773FC2DB64ACC001F88BC /* Build configuration list for PBXNativeTarget "2048-ai" */;
+			buildPhases = (
+				508773ED2DB64ACC001F88BC /* Headers */,
+				508773EE2DB64ACC001F88BC /* Sources */,
+				508773EF2DB64ACC001F88BC /* Frameworks */,
+				508773F02DB64ACC001F88BC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				508773F32DB64ACC001F88BC /* 2048-ai */,
+			);
+			name = "2048-ai";
+			packageProductDependencies = (
+			);
+			productName = "2048-ai";
+			productReference = 508773F22DB64ACC001F88BC /* _048_ai.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 		50DCEC612D9665F6001656BA /* 2048Tests */ = {
 			isa = PBXNativeTarget;
@@ -152,6 +242,9 @@
 					507332BD2D79D22A00ABBCCF = {
 						CreatedOnToolsVersion = 16.2;
 					};
+					508773F12DB64ACC001F88BC = {
+						CreatedOnToolsVersion = 16.2;
+					};
 					50DCEC612D9665F6001656BA = {
 						CreatedOnToolsVersion = 16.2;
 						TestTargetID = 507332BD2D79D22A00ABBCCF;
@@ -174,12 +267,20 @@
 			targets = (
 				507332BD2D79D22A00ABBCCF /* 2048 */,
 				50DCEC612D9665F6001656BA /* 2048Tests */,
+				508773F12DB64ACC001F88BC /* 2048-ai */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		507332BC2D79D22A00ABBCCF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		508773F02DB64ACC001F88BC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -203,6 +304,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		508773EE2DB64ACC001F88BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		50DCEC5E2D9665F6001656BA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -213,6 +321,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		508773F92DB64ACC001F88BC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 508773F12DB64ACC001F88BC /* 2048-ai */;
+			targetProxy = 508773F82DB64ACC001F88BC /* PBXContainerItemProxy */;
+		};
 		50DCEC672D9665F6001656BA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 507332BD2D79D22A00ABBCCF /* 2048 */;
@@ -281,6 +394,7 @@
 				OTHER_CFLAGS = "";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TREAT_MISSING_BASELINES_AS_TEST_FAILURES = NO;
 			};
@@ -339,6 +453,7 @@
 				OTHER_CFLAGS = "";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -367,6 +482,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = louxu.hnu.2048mobile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -396,8 +512,79 @@
 				PRODUCT_BUNDLE_IDENTIFIER = louxu.hnu.2048mobile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		508773FD2DB64ACC001F88BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = RR6RMK42AU;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = "louxu.hnu.-048-ai";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		508773FE2DB64ACC001F88BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = RR6RMK42AU;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = "louxu.hnu.-048-ai";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
@@ -454,6 +641,15 @@
 			buildConfigurations = (
 				507332CD2D79D22B00ABBCCF /* Debug */,
 				507332CE2D79D22B00ABBCCF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		508773FC2DB64ACC001F88BC /* Build configuration list for PBXNativeTarget "2048-ai" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				508773FD2DB64ACC001F88BC /* Debug */,
+				508773FE2DB64ACC001F88BC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

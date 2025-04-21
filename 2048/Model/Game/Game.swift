@@ -8,7 +8,7 @@
 import Foundation
 
 var initTilesAmount = 2
-let emptyValue: UInt8 = 63
+let emptyValue: UInt8 = 16
 let targetValue: UInt8 = 11
 
 @Observable
@@ -66,6 +66,20 @@ class Game: Codable {
             }
         }
         return true
+    }
+    
+    var cxxBoard: UInt64 {
+        if gameSize.height != 4 && gameSize.width != 4 {
+            assertionFailure("The gameSize must be 4 * 4!")
+        }
+        var value: UInt64 = 0
+        for i in 0..<16 {
+            let col = i % 4, row = i / 4
+            if valueBoard[row][col] != emptyValue {
+                value |= UInt64(valueBoard[row][col]) << (i * 4)
+            }
+        }
+        return value
     }
     
     func newGame() -> [Tile] {

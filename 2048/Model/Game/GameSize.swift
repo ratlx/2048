@@ -7,16 +7,17 @@
 
 import Foundation
 
+//It is not recommended to modify the width and height.
+//Because the 2048-AI can be only used in 4*4
+//Once you modify the width and height, you should also modify the gameDataFileName
 @Observable
 class GameSize: Codable {
-    var width: Int
-    var height: Int
+    var width: Int = 4
+    var height: Int = 4
     var gridSize: CGFloat
     var gridMargin: CGFloat
     
-    init(width: Int = 4, height: Int = 4, gridSize: CGFloat = 57.5, gridMargin: CGFloat = 10) {
-        self.width = width
-        self.height = height
+    init(gridSize: CGFloat = 57.5, gridMargin: CGFloat = 10) {
         self.gridSize = gridSize
         self.gridMargin = gridMargin
     }
