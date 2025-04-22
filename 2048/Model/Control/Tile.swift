@@ -7,11 +7,22 @@
 
 import Foundation
 
-struct Tile {
-    var value: UInt8
+@Observable
+class Tile: Hashable {
     var col: Int
     var row: Int
     var gameSize: GameSize
+    var value: UInt8
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(col)
+        hasher.combine(row)
+        hasher.combine(value)
+    }
+    
+    static func ==(lhs: Tile, rhs: Tile) -> Bool {
+        return lhs.value == rhs.value && lhs.col == rhs.col && lhs.row == rhs.row
+    }
     
     var x: CGFloat {
         get {

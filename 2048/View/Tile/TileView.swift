@@ -29,7 +29,7 @@ struct TileView: View {
                 .font(.system(size: tileViewModel.fontSize, weight: .bold))
                 .foregroundColor(tileViewModel.fontColor)
         }
-
+        .id(tileViewModel.tile)
     }
     
     init(value: UInt8, row: Int = 0, col: Int = 0, gameSize: GameSize) {

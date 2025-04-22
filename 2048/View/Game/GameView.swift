@@ -41,7 +41,7 @@ struct GameView: View {
                 
                 WinnerView(isRestart: $isRestart, isKeepGoing: $isKeepGoing, isButtonEnabled: $isButtonEnabled)
                     .opacity(game.winner ? 1 : 0)
-                    .opacity(isKeepGoing ? 0 : 1)
+                    .opacity(isGameOver || isKeepGoing ? 0 : 1)
             }
             .environment(game.gameSize)
             .onAppear {
@@ -91,16 +91,14 @@ struct GameView: View {
                 if let direction = Direction(rawValue: bestMove) {
                     doMerge(direction: direction)          // It may not be available under preview
                 }
-            } else {
-                Thread.sleep(forTimeInterval: 0.3)
             }
+            Thread.sleep(forTimeInterval: 0.1)
         }
     }
     
     enum PopUpType {
         case initialize
         case newGame
-        case update
     }
     
     private func tilesPopUp(type: PopUpType) {
@@ -112,7 +110,7 @@ struct GameView: View {
         mergingQueue.async {
             let initTiles = type == .newGame ? game.newGame() : game.gameInitialize()
             tileViews = initTiles.map { TileViewModel(tile: $0) }
-            withAnimation(type == .update ? .none : .easeIn(duration: 0.2)) {
+            withAnimation(.easeIn(duration: 0.2)) {
                 for tileView in tileViews {
                     newAnimateTiles.insert(tileView.id)
                 }
@@ -201,9 +199,9 @@ struct GameView: View {
         guard game.gameOver else { return }
         
         isButtonEnabled = false
-        isKeepGoing = false
         withAnimation(.easeIn(duration: 0.8).delay(1.2)) {
             isGameOver = true
+            isKeepGoing = false
         }
     
         Thread.sleep(forTimeInterval: 2)
