@@ -8,16 +8,17 @@
 import SwiftUI
 import _048_ai
 
-private let mergingQueue = DispatchQueue(label: "com.2048.mergingQueue")
-private var aiInterrupt = false
-private var isTooFast = false
-private var lastMerge = Date()
-
 struct GameView: View {
     @State private var tileViews: [TileViewModel] = []
     @State private var newAnimateTiles: Set<UUID> = []
     @State private var eatAnimateTiles: Set<UUID> = []
     @State private var increaseList = IncreaseList()
+    
+    private let mergingQueue = DispatchQueue(label: "com.2048.mergingQueue")
+    @State private var aiInterrupt = false
+    @State private var lastMerge = Date()
+    @State private var timeInterval: Double = 0.1
+    
     @State private var isRestart = false
     @State private var isGameOver = false
     @State private var isKeepGoing = true
@@ -92,7 +93,7 @@ struct GameView: View {
                     doMerge(direction: direction)          // It may not be available under preview
                 }
             }
-            Thread.sleep(forTimeInterval: 0.1)
+            Thread.sleep(forTimeInterval: 0.05)
         }
     }
     
@@ -125,21 +126,15 @@ struct GameView: View {
         }
     }
     
-    private func gameExamine() {
-        let now = Date()
-        if now.timeIntervalSince(lastMerge) <= 0.3 {
-            isTooFast = true
-        } else if isTooFast {
-            isTooFast = false
-        }
-        lastMerge = now
+    private var moveTime: Double {
+        min(0.1, timeInterval)
     }
     
     private func doMerge(direction: Direction) {
         let result = game.merge(direction: direction)
         guard let _ = result.newTile else { return }
         
-        gameExamine()
+        timeInterval = -lastMerge.timeIntervalSinceNow
         increaseList.add(value: result.scoreIncrease)
         
         animate(merges: result.merges, tile: result.newTile!)
@@ -162,7 +157,7 @@ struct GameView: View {
                 }
             }
             
-            withAnimation(.easeInOut(duration: 0.1)) {
+            withAnimation(.easeInOut(duration: moveTime)) {
                 for tileView in tileViews {
                     if let action = merges.actions[.init(col: tileView.col, row: tileView.row)] {
                         tileView.move(dx: action.dx ?? 0, dy: action.dy ?? 0)
@@ -170,9 +165,8 @@ struct GameView: View {
                 }
             }
             
-            if !isTooFast {
-                Thread.sleep(forTimeInterval: 0.1)
-            }
+            print("sleep: \(moveTime)")
+            Thread.sleep(forTimeInterval: moveTime)
             for tileView in tileViews {
                 if eatList.contains(tileView.id) {
                     tileView.increase()
@@ -181,7 +175,7 @@ struct GameView: View {
             tileViews.append(.init(tile: tile))
             eatAnimateTiles = eatList
             
-            if !eatList.isEmpty && !isTooFast {
+            if !eatList.isEmpty {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             }
             
@@ -192,6 +186,8 @@ struct GameView: View {
             withAnimation(.easeIn(duration: 0.2)) {
                 let _ = newAnimateTiles.insert(tileViews.last!.id)
             }
+            
+            lastMerge = .now
         }
     }
     
