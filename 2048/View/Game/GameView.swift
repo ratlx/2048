@@ -88,7 +88,9 @@ struct GameView: View {
         while isAIEnable && !aiInterrupt {
             if isKeepGoing {
                 let bestMove = find_best_move(game.cxxBoard)
-                doMerge(direction: Direction(rawValue: bestMove)!)
+                if let direction = Direction(rawValue: bestMove) {
+                    doMerge(direction: direction)          // It may not be available under preview
+                }
             } else {
                 Thread.sleep(forTimeInterval: 0.3)
             }

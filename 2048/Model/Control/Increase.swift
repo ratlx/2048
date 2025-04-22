@@ -7,7 +7,7 @@
 
 import Foundation
 
-let IncreaseListSize = 5
+let IncreaseListSize = 30
 
 @Observable
 class IncreaseList {
