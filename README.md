@@ -7,3 +7,7 @@ minimum requirement for ios: 18.0
 Swift version: 6.0
 
 2048-ai: https://github.com/nneonneo/2048-ai
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
