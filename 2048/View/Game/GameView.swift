@@ -16,8 +16,7 @@ struct GameView: View {
     
     private let mergingQueue = DispatchQueue(label: "com.2048.mergingQueue")
     @State private var aiInterrupt = false
-    @State private var lastMerge = Date()
-    @State private var timeInterval: Double = 0.1
+    @State private var mergingCount = 0
     
     @State private var isRestart = false
     @State private var isGameOver = false
@@ -104,16 +103,21 @@ struct GameView: View {
     
     private func tilesPopUp(type: PopUpType) {
         isGameOver = false
-        newAnimateTiles.removeAll()
         isKeepGoing = true
         aiInterrupt = true
         
         mergingQueue.async {
+            while mergingCount != 0 {
+                Thread.sleep(forTimeInterval: 0.1)
+            }
             let initTiles = type == .newGame ? game.newGame() : game.gameInitialize()
-            tileViews = initTiles.map { TileViewModel(tile: $0) }
-            withAnimation(.easeIn(duration: 0.2)) {
-                for tileView in tileViews {
-                    newAnimateTiles.insert(tileView.id)
+            DispatchQueue.main.async {
+                newAnimateTiles.removeAll()
+                tileViews = initTiles.map { TileViewModel(tile: $0) }
+                withAnimation(.easeIn(duration: 0.2)) {
+                    for tileView in tileViews {
+                        newAnimateTiles.insert(tileView.id)
+                    }
                 }
             }
             if type == .initialize {
@@ -126,24 +130,22 @@ struct GameView: View {
         }
     }
     
-    private var moveTime: Double {
-        min(0.1, timeInterval)
-    }
-    
     private func doMerge(direction: Direction) {
         let result = game.merge(direction: direction)
         guard let _ = result.newTile else { return }
         
-        timeInterval = -lastMerge.timeIntervalSinceNow
         increaseList.add(value: result.scoreIncrease)
         
-        animate(merges: result.merges, tile: result.newTile!)
+        DispatchQueue.main.async {
+            animate(merges: result.merges, tile: result.newTile!)
+        }
         
         gameWinnerCheck()
         gameOverCheck()
         game.save()
         
         func animate(merges: Merges, tile: Tile) {
+            mergingCount += 1
             var eatList = Set<UUID>()
             
             tileViews = tileViews.filter { $0.zState == .above }
@@ -157,37 +159,37 @@ struct GameView: View {
                 }
             }
             
-            withAnimation(.easeInOut(duration: moveTime)) {
+            withAnimation(.easeInOut(duration: 0.1)) {
                 for tileView in tileViews {
                     if let action = merges.actions[.init(col: tileView.col, row: tileView.row)] {
                         tileView.move(dx: action.dx ?? 0, dy: action.dy ?? 0)
                     }
                 }
             }
+            let newTile = TileViewModel(tile: tile)
+            tileViews.append(newTile)
             
-            print("sleep: \(moveTime)")
-            Thread.sleep(forTimeInterval: moveTime)
-            for tileView in tileViews {
-                if eatList.contains(tileView.id) {
-                    tileView.increase()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                for tileView in tileViews {
+                    if eatList.contains(tileView.id) {
+                        tileView.increase()
+                    }
                 }
+                eatAnimateTiles = eatList
+                
+                if !eatList.isEmpty && mergingCount == 1 {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                }
+                
+                withAnimation(.spring(duration: 0.2, bounce: 0.5)) {
+                    eatAnimateTiles.removeAll()
+                }
+                
+                withAnimation(.easeIn(duration: 0.2)) {
+                    let _ = newAnimateTiles.insert(newTile.id)
+                }
+                mergingCount -= 1
             }
-            tileViews.append(.init(tile: tile))
-            eatAnimateTiles = eatList
-            
-            if !eatList.isEmpty {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-            }
-            
-            withAnimation(.spring(duration: 0.2, bounce: 0.5)) {
-                eatAnimateTiles.removeAll()
-            }
-            
-            withAnimation(.easeIn(duration: 0.2)) {
-                let _ = newAnimateTiles.insert(tileViews.last!.id)
-            }
-            
-            lastMerge = .now
         }
     }
     
