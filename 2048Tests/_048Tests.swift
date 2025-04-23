@@ -10,7 +10,7 @@ import Testing
 
 struct _048Tests {
     @Test func setXY() async throws {
-        var tile = Tile(row: 2, col: 1, gameSize: GameSize(width: 5, height: 4))
+        let tile = Tile(row: 2, col: 1, gameSize: GameSize(width: 5, height: 4))
         
         /*eeeee
          *eeeee
@@ -39,7 +39,7 @@ struct _048Tests {
     }
     
     @Test func doMerge() async throws {
-        var game = Game(gameSize: GameSize())
+        let game = Game(gameSize: GameSize())
         game.valueBoard = [[1,emptyValue,emptyValue,1], [1,emptyValue,2,1], [emptyValue,2,emptyValue,1], [1,2,2,1]]
         game.tilesAmount = 11
         
@@ -83,7 +83,7 @@ struct _048Tests {
     }
     
     @Test func winner() async throws {
-        var game = Game(gameSize: GameSize())
+        let game = Game(gameSize: GameSize())
         game.score = 20000
         
         game.valueBoard[1][1] = targetValue
