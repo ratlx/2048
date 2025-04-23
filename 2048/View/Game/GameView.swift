@@ -134,9 +134,8 @@ struct GameView: View {
         let result = game.merge(direction: direction)
         guard let _ = result.newTile else { return }
         
-        increaseList.add(value: result.scoreIncrease)
-        
         DispatchQueue.main.async {
+            increaseList.add(value: result.scoreIncrease)
             animate(merges: result.merges, tile: result.newTile!)
         }
         
@@ -197,9 +196,11 @@ struct GameView: View {
         guard game.gameOver else { return }
         
         isButtonEnabled = false
-        withAnimation(.easeIn(duration: 0.8).delay(1.2)) {
-            isGameOver = true
-            isKeepGoing = false
+        DispatchQueue.main.async {
+            withAnimation(.easeIn(duration: 0.8).delay(1.2)) {
+                isGameOver = true
+                isKeepGoing = false
+            }
         }
     
         Thread.sleep(forTimeInterval: 2)
@@ -210,8 +211,10 @@ struct GameView: View {
         guard game.isWinner else { return }
         
         isButtonEnabled = false
-        withAnimation(.easeIn(duration: 0.8).delay(1.2)) {
-            isKeepGoing = false
+        DispatchQueue.main.async {
+            withAnimation(.easeIn(duration: 0.8).delay(1.2)) {
+                isKeepGoing = false
+            }
         }
         
         Thread.sleep(forTimeInterval: 2)
