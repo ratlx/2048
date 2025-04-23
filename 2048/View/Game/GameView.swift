@@ -89,7 +89,7 @@ struct GameView: View {
             if isKeepGoing {
                 let bestMove = find_best_move(game.cxxBoard)
                 if let direction = Direction(rawValue: bestMove) {
-                    doMerge(direction: direction)          // It may not be available under preview
+                    doMerge(direction: direction)
                 }
             }
             Thread.sleep(forTimeInterval: 0.05)
@@ -219,6 +219,10 @@ struct GameView: View {
         
         Thread.sleep(forTimeInterval: 2)
         isButtonEnabled = true
+    }
+    
+    init() {
+        init_tables()
     }
 }
 

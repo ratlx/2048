@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import _048_ai
 
 @main
 struct _048: App {
@@ -21,6 +20,5 @@ struct _048: App {
     
     init() {
         game = DataManager.initializeGame(filename: gameDataFileName)
-        init_tables()
     }
 }
