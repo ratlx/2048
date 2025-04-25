@@ -8,7 +8,7 @@
 import Foundation
 
 let resourcesURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Resources")
-let gameDataFileName = "s3.json"
+let gameDataFileName = "s4.json"
 
 struct DataManager {
     

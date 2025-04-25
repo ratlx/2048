@@ -15,7 +15,6 @@ struct GameView: View {
     @State private var increaseList = IncreaseList()
     
     private let mergingQueue = DispatchQueue(label: "com.2048.mergingQueue")
-    @State private var aiInterrupt = false
     @State private var mergingCount = 0
     
     @State private var isRestart = false
@@ -45,19 +44,22 @@ struct GameView: View {
             }
             .environment(game.gameSize)
             .onAppear {
-                tilesPopUp(type: .initialize)
+                mergingQueue.async {
+                    tilesPopUp(type: .initialize)
+                }
             }
             .gesture(
                 DragGesture()
                     .onEnded { value in
-                        guard isKeepGoing && !isAIEnable else { return }
                         mergingQueue.async {
                             manulMerge(from: value)
                         }
                     }
             )
             .onChange(of: isRestart) {
-                tilesPopUp(type: .newGame)
+                mergingQueue.async {
+                    tilesPopUp(type: .newGame)
+                }
             }
             .onChange(of: isAIEnable) {
                 mergingQueue.async {
@@ -71,6 +73,8 @@ struct GameView: View {
     }
     
     private func manulMerge(from value: DragGesture.Value) {
+        guard isKeepGoing && !isAIEnable else { return }
+        
         let horizontalAmount = value.translation.width
         let verticalAmount = value.translation.height
         let direction: Direction
@@ -85,14 +89,17 @@ struct GameView: View {
     }
     
     private func aiMerge() {
-        while isAIEnable && !aiInterrupt {
-            if isKeepGoing {
-                let bestMove = find_best_move(game.cxxBoard)
-                if let direction = Direction(rawValue: bestMove) {
-                    doMerge(direction: direction)
-                }
+        guard isAIEnable else { return }
+        
+        if isKeepGoing {
+            let bestMove = find_best_move(game.cxxBoard)
+            if let direction = Direction(rawValue: bestMove) {
+                doMerge(direction: direction)
             }
-            Thread.sleep(forTimeInterval: 0.05)
+        }
+        
+        mergingQueue.asyncAfter(deadline: .now() + 0.05) {
+            aiMerge()
         }
     }
     
@@ -102,31 +109,35 @@ struct GameView: View {
     }
     
     private func tilesPopUp(type: PopUpType) {
-        isGameOver = false
+        let UIReady = DispatchSemaphore(value: 0)
         isKeepGoing = true
-        aiInterrupt = true
+        isGameOver = false
+
+        let initTiles = type == .newGame ? game.newGame() : game.gameInitialize()
+        DispatchQueue.main.async {
+            animate()
+        }
+        UIReady.wait()
         
-        mergingQueue.async {
-            while mergingCount != 0 {
-                Thread.sleep(forTimeInterval: 0.1)
+        if type == .initialize {
+            gameOverCheck()
+        }
+        
+        func animate() {
+            if mergingCount != 0 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    animate()
+                }
+                return
             }
-            let initTiles = type == .newGame ? game.newGame() : game.gameInitialize()
-            DispatchQueue.main.async {
-                newAnimateTiles.removeAll()
-                tileViews = initTiles.map { TileViewModel(tile: $0) }
-                withAnimation(.easeIn(duration: 0.2)) {
-                    for tileView in tileViews {
-                        newAnimateTiles.insert(tileView.id)
-                    }
+            newAnimateTiles.removeAll()
+            tileViews = initTiles.map { TileViewModel(tile: $0) }
+            withAnimation(.easeIn(duration: 0.2)) {
+                for tileView in tileViews {
+                    newAnimateTiles.insert(tileView.id)
                 }
             }
-            if type == .initialize {
-                gameOverCheck()
-            }
-            aiInterrupt = false
-            if isAIEnable {
-                aiMerge()
-            }
+            UIReady.signal()
         }
     }
     
