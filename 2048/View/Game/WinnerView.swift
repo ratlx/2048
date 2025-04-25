@@ -27,7 +27,7 @@ struct WinnerView: View {
                 
                 HStack {
                     Button {
-                        isKeepGoing = true
+                        isKeepGoing.toggle()
                     } label: {
                         Text("Keep going")
                             .font(.callout)
